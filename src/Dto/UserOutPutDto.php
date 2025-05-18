@@ -112,7 +112,7 @@ class UserOutPutDto
      */
     public $Gerencia;
 
-        /**
+    /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
     public $Coordinacion;
@@ -161,17 +161,6 @@ class UserOutPutDto
     *      description="componentes"
     * )     */
     public $componentes;
-
-    /**
-    * @OA\Property(
-    *      type="array",
-    *      @OA\Items(
-    *          type="array",
-    *          @OA\Items()
-    *      ),
-    *      description="instrumentosPendientes"
-    * )     */
-    public  $instrumentosPendientes;
    
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -193,7 +182,7 @@ class UserOutPutDto
      */
     public $direccion;
 
-        /**
+    /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
     public $sexo;
@@ -363,14 +352,6 @@ class UserOutPutDto
     public function getComponentes()
     {
         return $this->componentes;
-    }
-
-    /**
-     * @see Array
-     */
-    public function getInstrumentosPendientes()
-    {
-        return $this->instrumentosPendientes;
     }
 
     public function getPais(): string

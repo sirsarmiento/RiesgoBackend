@@ -172,6 +172,8 @@ class UserRepository extends ServiceEntityRepository
             $userDto->email=$valor->getEmail();
             $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
             $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
+            $userDto->Gerencia=($valor->getIdGerencia()!=null)?array("id"=>$valor->getIdGerencia()->getId(),"Nombre"=>$valor->getIdGerencia()->getNombre()):[];
+            $userDto->Coordinacion=($valor->getIdCoordinacion()!=null)?array("id"=>$valor->getIdCoordinacion()->getId(),"Nombre"=>$valor->getIdCoordinacion()->getNombre()):[]; 
             $userDto->pais=($valor->getPais()!=null)?array("id"=>$valor->getPais()->getId(),"Nombre"=>$valor->getPais()->getNombre()):[];
             $userDto->status=($valor->getIdStatus()!=null)?array("id"=>$valor->getIdStatus()->getId(),"Descripcion"=>$valor->getIdStatus()->getDescripcion()):[];
             $userDto->estado=($valor->getEstado()!=null)?array("id"=>$valor->getEstado()->getId(),"Nombre"=>$valor->getEstado()->getNombre()):[];
@@ -245,7 +247,6 @@ class UserRepository extends ServiceEntityRepository
             $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):null;
             $userDto->Gerencia=($valor->getIdGerencia()!=null)?array("gerenciaId"=>$valor->getIdGerencia()->getId(),"nombreGerencia"=>$valor->getIdGerencia()->getNombre()):null;
             $userDto->Coordinacion=($valor->getIdCoordinacion()!=null)?array("coordinacionId"=>$valor->getIdCoordinacion()->getId(),"nombreCoordinacion"=>$valor->getIdCoordinacion()->getNombre()):null;
-
             $userDto->status=($valor->getIdStatus()!=null)?array("id"=>$valor->getIdStatus()->getId(),"Descripcion"=>$valor->getIdStatus()->getDescripcion()):[];
             $userDto->pais=($valor->getPais()!=null)?array("id"=>$valor->getPais()->getId(),"Nombre"=>$valor->getPais()->getNombre()):[];
             $userDto->estado=($valor->getEstado()!=null)?array("id"=>$valor->getEstado()->getId(),"Nombre"=>$valor->getEstado()->getNombre()):[];
@@ -326,6 +327,8 @@ class UserRepository extends ServiceEntityRepository
             $userDto->email=$valor->getEmail();
             $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
             $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
+            $userDto->Gerencia=($valor->getIdGerencia()!=null)?array("id"=>$valor->getIdGerencia()->getId(),"Nombre"=>$valor->getIdGerencia()->getNombre()):[];
+            $userDto->Coordinacion=($valor->getIdCoordinacion()!=null)?array("id"=>$valor->getIdCoordinacion()->getId(),"Nombre"=>$valor->getIdCoordinacion()->getNombre()):[];
             $userDto->status=($valor->getIdStatus()!=null)?array("id"=>$valor->getIdStatus()->getId(),"Descripcion"=>$valor->getIdStatus()->getDescripcion()):[];
             $userDto->pais=($valor->getPais()!=null)?array("id"=>$valor->getPais()->getId(),"Nombre"=>$valor->getPais()->getNombre()):[];
             $userDto->estado=($valor->getEstado()!=null)?array("id"=>$valor->getEstado()->getId(),"Nombre"=>$valor->getEstado()->getNombre()):[];
