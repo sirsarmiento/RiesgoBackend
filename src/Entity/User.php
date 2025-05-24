@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Empresa;
+use App\Entity\Riesgo\ProyectoResponsables;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Riesgo\Proyecto;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -188,6 +190,11 @@ class User implements UserInterface
      */
     private $idempresa;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Proyecto::class, mappedBy="users")
+     */
+    private Collection $proyectos;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -196,7 +203,7 @@ class User implements UserInterface
         $this->iduserhistbloqueo = new ArrayCollection();
         $this->cuentaEmails = new ArrayCollection();
         $this->histMovmtItemsIdUser = new ArrayCollection();
-
+        $this->proyectos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -678,5 +685,23 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getProyectos(): Collection
+    {
+        return $this->proyectos;
+    }
+
+    public function addProyecto(Proyecto $proyecto): self
+    {
+        if (!$this->proyectos->contains($proyecto)) {
+            $this->proyectos[] = $proyecto;
+        }
+        return $this;
+    }
+
+    public function removeProyecto(Proyecto $proyecto): self
+    {
+        $this->proyectos->removeElement($proyecto);
+        return $this;
+    }
 
 }

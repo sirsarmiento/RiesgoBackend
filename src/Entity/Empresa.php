@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\Riesgo\Proyecto;
 use App\Entity\Status;
 use App\Repository\EmpresaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -53,6 +56,16 @@ class Empresa
      * @ORM\Column(type="string", length=1000)
      */
     private $url_logo;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Proyecto::class, mappedBy="empresa")
+     */
+    private $proyectos;
+
+    public function __construct()
+    {
+        $this->proyectos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -139,6 +152,36 @@ class Empresa
     public function setUrlLogo(string $url_logo): self
     {
         $this->url_logo = $url_logo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Proyecto[]
+     */
+    public function getProyectos(): Collection
+    {
+        return $this->proyectos;
+    }
+
+    public function addProyecto(Proyecto $proyecto): self
+    {
+        if (!$this->proyectos->contains($proyecto)) {
+            $this->proyectos[] = $proyecto;
+            $proyecto->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProyecto(Proyecto $proyecto): self
+    {
+        if ($this->proyectos->removeElement($proyecto)) {
+            // set the owning side to null (unless already changed)
+            if ($proyecto->getEmpresa() === $this) {
+                $proyecto->setEmpresa(null);
+            }
+        }
 
         return $this;
     }
