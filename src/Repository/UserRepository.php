@@ -1075,18 +1075,20 @@ class UserRepository extends ServiceEntityRepository
         ->where('u.idempresa ='.$empresa->getId())
         ->orderBy('u.id', 'ASC')
         ->getQuery()
-        ->getResult()
-    ;
-    $datausers=array();
-    foreach($data as $clave=>$valor){
-        $userDto =new UserOutPutDto();
-        $userDto->id=$valor->getId();
-        $userDto->primerNombre=$valor->getPrimerNombre(); 
-        $userDto->primerApellido= $valor->getPrimerApellido();
-        $userDto->email=$valor->getEmail();
-        $datausers[]=$userDto;
-    }
-    return array("data"=>$datausers);
+        ->getResult();
+
+        $datausers=array();
+        foreach($data as $clave=>$valor){
+            $userDto =new UserOutPutDto();
+            $userDto->id=$valor->getId();
+            $userDto->primerNombre=$valor->getPrimerNombre(); 
+            $userDto->primerApellido= $valor->getPrimerApellido();
+            $userDto->email=$valor->getEmail();
+            $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
+            $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
+            $datausers[]=$userDto;
+        }
+        return array("data"=>$datausers);
        
 
     }   
