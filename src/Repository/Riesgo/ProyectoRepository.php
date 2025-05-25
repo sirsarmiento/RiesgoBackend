@@ -46,7 +46,7 @@ class ProyectoRepository extends ServiceEntityRepository
             if($empresa)
                 $entity->setEmpresa($empresa);  
             
-            foreach ($data["responsables"] as $key => $value) {
+            foreach ($data["responsibles"] as $key => $value) {
                 $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
                 if ($user) {
                     $entity->addUser($user);
@@ -86,7 +86,7 @@ class ProyectoRepository extends ServiceEntityRepository
                 'id'          => $proyecto->getId(),
                 'name'        => $proyecto->getName(),
                 'descripcion' => $proyecto->getDescripcion(),
-                'responsible' => $responsibles,
+                'responsibles' => $responsibles,
             ];
         }
         return $result;
@@ -118,7 +118,7 @@ class ProyectoRepository extends ServiceEntityRepository
                 'id'          => $proyecto->getId(),
                 'name'        => $proyecto->getName(),
                 'descripcion' => $proyecto->getDescripcion(),
-                'responsible' => $responsibles,
+                'responsibles' => $responsibles,
             ];
         }
         return $result;
