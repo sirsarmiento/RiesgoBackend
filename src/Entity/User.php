@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Riesgo\Proyecto;
+use App\Entity\Riesgo\Proceso;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -204,6 +205,7 @@ class User implements UserInterface
         $this->cuentaEmails = new ArrayCollection();
         $this->histMovmtItemsIdUser = new ArrayCollection();
         $this->proyectos = new ArrayCollection();
+        $this->procesos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -701,6 +703,25 @@ class User implements UserInterface
     public function removeProyecto(Proyecto $proyecto): self
     {
         $this->proyectos->removeElement($proyecto);
+        return $this;
+    }
+
+    public function getProcesos(): Collection
+    {
+        return $this->procesos;
+    }
+
+    public function addProceso(Proceso $proceso): self
+    {
+        if (!$this->procesos->contains($proceso)) {
+            $this->procesos[] = $proceso;
+        }
+        return $this;
+    }
+
+    public function removeProceso(Proceso $proceso): self
+    {
+        $this->procesos->removeElement($proceso);
         return $this;
     }
 

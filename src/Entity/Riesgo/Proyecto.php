@@ -61,9 +61,15 @@ class Proyecto
      */
     private Collection $users;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Proceso::class, mappedBy="project")
+     */
+    private $procesos;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->procesos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,6 +180,36 @@ class Proyecto
         if ($this->users->removeElement($user)) {
             $user->removeProyecto($this);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection|Proceso[]
+     */
+    public function getProceso(): Collection
+    {
+        return $this->proceso;
+    }
+
+    public function addProceso(Proceso $Proceso): self
+    {
+        if (!$this->proceso->contains($Proceso)) {
+            $this->proceso[] = $Proceso;
+            $Proceso->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProceso(Proceso $Proceso): self
+    {
+        if ($this->proceso->removeElement($Proceso)) {
+            // set the owning side to null (unless already changed)
+            if ($Proceso->getProject() === $this) {
+                $Proceso->setProject(null);
+            }
+        }
+
         return $this;
     }
 }

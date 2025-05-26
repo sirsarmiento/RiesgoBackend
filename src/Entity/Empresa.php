@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Proyecto;
 use App\Entity\Status;
 use App\Repository\EmpresaRepository;
@@ -62,9 +63,16 @@ class Empresa
      */
     private $proyectos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Proceso::class, mappedBy="empresa")
+     */
+    private $procesos;
+
+
     public function __construct()
     {
         $this->proyectos = new ArrayCollection();
+        $this->procesos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +188,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($proyecto->getEmpresa() === $this) {
                 $proyecto->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Proceso[]
+     */
+    public function getProcesos(): Collection
+    {
+        return $this->procesos;
+    }
+
+    public function addProceso(Proceso $proceso): self
+    {
+        if (!$this->procesos->contains($proceso)) {
+            $this->procesos[] = $proceso;
+            $proceso->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProceso(Proceso $proceso): self
+    {
+        if ($this->procesos->removeElement($proceso)) {
+            // set the owning side to null (unless already changed)
+            if ($proceso->getEmpresa() === $this) {
+                $proceso->setEmpresa(null);
             }
         }
 
