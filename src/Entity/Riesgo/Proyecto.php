@@ -70,6 +70,10 @@ class Proyecto
     {
         $this->users = new ArrayCollection();
         $this->procesos = new ArrayCollection();
+        $this->createAt = new \DateTime();
+        $this->createBy = 'system'; // Default creator, can be changed later
+        $this->updateAt = null; // Initially no updates
+        $this->updateBy = null; // Initially no updates
     }
 
     public function getId(): ?int

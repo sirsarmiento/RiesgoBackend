@@ -2,7 +2,7 @@
 
 namespace App\Repository\Riesgo;
 
-use App\Entity\Riesgo\Proceso;
+use App\Entity\Riesgo\Riesgo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -10,28 +10,28 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Empresa;
 Use App\Entity\User;
-/**
- * @method Proceso|null find($id, $lockMode = null, $lockVersion = null)
- * @method Proceso|null findOneBy(array $criteria, array $orderBy = null)
- * @method Proceso[]    findAll()
- * @method Proceso[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class ProcesoRepository extends ServiceEntityRepository
-{
 
+/**
+ * @method Riesgo|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Riesgo|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Riesgo[]    findAll()
+ * @method Riesgo[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
+class RiesgoRepository extends ServiceEntityRepository
+{
     public function __construct(ManagerRegistry $registry, Security $security)
     {
         $this->security = $security;
-        parent::__construct($registry, Proceso::class);
+        parent::__construct($registry, Riesgo::class);
     }
 
     /**
-     * Create proceso.
+     * Create Riesgo.
      */
     public function post($data,$validator,$helper): JsonResponse  {
 
         $entityManager = $this->getEntityManager();
-        $entity=$helper->setParametersToEntity(new Proceso(),$data);
+        $entity=$helper->setParametersToEntity(new Riesgo(),$data);
 
         $errors = $validator->validate($entity);
         if($errors->count() > 0){
@@ -65,16 +65,16 @@ class ProcesoRepository extends ServiceEntityRepository
     public function getAll(): array
     {
         $entityManager = $this->getEntityManager();
-        $procesos = $this->createQueryBuilder('p')
+        $riesgos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
             ->getQuery()
             ->getResult();
 
         $result = [];
-        foreach ($procesos as $proceso) {
+        foreach ($riesgos as $riesgo) {
             $responsibles = [];
-            foreach ($proceso->getUsers() as $user) {
+            foreach ($riesgo->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
                     'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
@@ -83,14 +83,9 @@ class ProcesoRepository extends ServiceEntityRepository
                 ];
             }
             $result[] = [
-                'id'          => $proceso->getId(),
-                'code'          => $proceso->getCode(),
-                'name'        => $proceso->getName(),
-                'category'   => $proceso->getCategory(),
-                'type'   => $proceso->getType(),
-                'process'   => $proceso->getProcess(),
-                'unit'   => $proceso->getUnit(),
-                'descripcion' => $proceso->getDescription(),
+                'id'          => $riesgo->getId(),
+                'name'        => $riesgo->getName(),
+                'descripcion' => $riesgo->getDescripcion(),
                 'responsibles' => $responsibles,
             ];
         }
@@ -100,7 +95,7 @@ class ProcesoRepository extends ServiceEntityRepository
     public function getById($id): array
     {
         $entityManager = $this->getEntityManager();
-        $procesos = $this->createQueryBuilder('p')
+        $riesgos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
             ->where('p.id = :id')
@@ -109,9 +104,9 @@ class ProcesoRepository extends ServiceEntityRepository
             ->getResult();
 
         $result = [];
-        foreach ($procesos as $proceso) {
+        foreach ($riesgos as $riesgo) {
             $responsibles = [];
-            foreach ($proceso->getUsers() as $user) {
+            foreach ($riesgo->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
                     'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
@@ -120,9 +115,9 @@ class ProcesoRepository extends ServiceEntityRepository
                 ];
             }
             $result[] = [
-                'id'          => $proceso->getId(),
-                'name'        => $proceso->getName(),
-                'descripcion' => $proceso->getDescripcion(),
+                'id'          => $riesgo->getId(),
+                'name'        => $riesgo->getName(),
+                'descripcion' => $riesgo->getDescripcion(),
                 'responsibles' => $responsibles,
             ];
         }

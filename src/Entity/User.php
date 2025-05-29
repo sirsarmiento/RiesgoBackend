@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Riesgo\Proyecto;
 use App\Entity\Riesgo\Proceso;
+use App\Entity\Riesgo\Riesgo;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -196,6 +197,16 @@ class User implements UserInterface
      */
     private Collection $proyectos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Proceso::class, mappedBy="users")
+     */
+    private Collection $procesos;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Riesgo::class, mappedBy="users")
+     */
+    private Collection $riesgos;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -206,6 +217,7 @@ class User implements UserInterface
         $this->histMovmtItemsIdUser = new ArrayCollection();
         $this->proyectos = new ArrayCollection();
         $this->procesos = new ArrayCollection();
+        $this->riesgos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -722,6 +734,25 @@ class User implements UserInterface
     public function removeProceso(Proceso $proceso): self
     {
         $this->procesos->removeElement($proceso);
+        return $this;
+    }
+
+    public function getRiesgos(): Collection
+    {
+        return $this->riesgos;
+    }
+
+    public function addRiesgo(Riesgo $riesgo): self
+    {
+        if (!$this->riesgos->contains($riesgo)) {
+            $this->riesgos[] = $riesgo;
+        }
+        return $this;
+    }
+
+    public function removeRiesgo(Riesgo $riesgo): self
+    {
+        $this->riesgos->removeElement($riesgo);
         return $this;
     }
 

@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Riesgo\CausaConsecuencia;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Proyecto;
+use App\Entity\Riesgo\Riesgo;
 use App\Entity\Status;
 use App\Repository\EmpresaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -68,11 +70,23 @@ class Empresa
      */
     private $procesos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Riesgo::class, mappedBy="empresa")
+     */
+    private $Riesgo;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CausaConsecuencia::class, mappedBy="empresa")
+     */
+    private $causaConsecuencias;
+
 
     public function __construct()
     {
         $this->proyectos = new ArrayCollection();
         $this->procesos = new ArrayCollection();
+        $this->Riesgo = new ArrayCollection();
+        $this->causaConsecuencias = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -218,6 +232,66 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($proceso->getEmpresa() === $this) {
                 $proceso->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Riesgo[]
+     */
+    public function getRiesgo(): Collection
+    {
+        return $this->Riesgo;
+    }
+
+    public function addRiesgo(Riesgo $riesgo): self
+    {
+        if (!$this->Riesgo->contains($riesgo)) {
+            $this->Riesgo[] = $riesgo;
+            $riesgo->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRiesgo(Riesgo $riesgo): self
+    {
+        if ($this->Riesgo->removeElement($riesgo)) {
+            // set the owning side to null (unless already changed)
+            if ($riesgo->getEmpresa() === $this) {
+                $riesgo->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CausaConsecuencia[]
+     */
+    public function getCausaConsecuencias(): Collection
+    {
+        return $this->causaConsecuencias;
+    }
+
+    public function addCausaConsecuencia(CausaConsecuencia $causaConsecuencia): self
+    {
+        if (!$this->causaConsecuencias->contains($causaConsecuencia)) {
+            $this->causaConsecuencias[] = $causaConsecuencia;
+            $causaConsecuencia->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCausaConsecuencia(CausaConsecuencia $causaConsecuencia): self
+    {
+        if ($this->causaConsecuencias->removeElement($causaConsecuencia)) {
+            // set the owning side to null (unless already changed)
+            if ($causaConsecuencia->getEmpresa() === $this) {
+                $causaConsecuencia->setEmpresa(null);
             }
         }
 

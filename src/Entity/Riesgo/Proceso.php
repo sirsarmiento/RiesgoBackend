@@ -2,10 +2,13 @@
 
 namespace App\Entity\Riesgo;
 
-use App\Entity\Empresa;
 use App\Repository\Riesgo\ProcesoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Empresa;
 use App\Entity\User;
+use App\Entity\Riesgo\Riesgo;
 /**
  * @ORM\Entity(repositoryClass=ProcesoRepository::class)
  */
@@ -89,9 +92,21 @@ class Proceso
      */
     private Collection $users;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Riesgo::class, mappedBy="procesos")
+     */
+    private Collection $riesgos;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->riesgos = new ArrayCollection();
+        $this->createAt = new \DateTime();
+        $this->createBy = 'system'; // Default creator
+        $this->updateAt = null; // Initially no updates
+        $this->updateBy = null; // Initially no updates
+        $this->category = 0; // Default category
+        $this->type = 0; // Default type
     }
 
     public function getId(): ?int
@@ -274,6 +289,25 @@ class Proceso
         if ($this->users->removeElement($user)) {
             $user->removeProceso($this);
         }
+        return $this;
+    }
+
+    public function getRiesgos(): Collection
+    {
+        return $this->riesgos;
+    }
+
+    public function addRiesgo(Riesgo $riesgo): self
+    {
+        if (!$this->riesgos->contains($riesgo)) {
+            $this->riesgos[] = $riesgo;
+        }
+        return $this;
+    }
+
+    public function removeRiesgo(Riesgo $riesgo): self
+    {
+        $this->riesgos->removeElement($riesgo);
         return $this;
     }
 }
