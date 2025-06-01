@@ -301,6 +301,7 @@ class Proceso
     {
         if (!$this->riesgos->contains($riesgo)) {
             $this->riesgos[] = $riesgo;
+            $riesgo->addProceso($this);
         }
         return $this;
     }

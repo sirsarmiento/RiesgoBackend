@@ -44,7 +44,7 @@ class Riesgo
     private $description;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="integer", options={"default": 0})
      */
     private $affect;
 
@@ -93,6 +93,7 @@ class Riesgo
 
     public function __construct()
     {
+        $this->users = new ArrayCollection();
         $this->procesos = new ArrayCollection();
         $this->causaConsecuencias = new ArrayCollection();
         $this->createAt = new \DateTime();

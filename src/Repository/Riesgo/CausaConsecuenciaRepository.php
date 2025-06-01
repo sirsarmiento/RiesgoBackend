@@ -59,18 +59,27 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
     public function getAll(): array
     {
         $entityManager = $this->getEntityManager();
-        $proyectos = $this->createQueryBuilder('p')
+        $causes = $this->createQueryBuilder('p')
+            ->leftJoin('p.riesgos', 'u')
+            ->addSelect('u')
             ->getQuery()
             ->getResult();
 
         $result = [];
-        foreach ($proyectos as $proyecto) {
+        foreach ($causes as $cause) {
+            $risks = [];
+            foreach ($cause->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'description' => $risk->getDescription(),
+                ];
+            }
             $result[] = [
-                'id'          => $proyecto->getId(),
-                'name'        => $proyecto->getName(),
-                'type'        => $proyecto->getType(),
-                'category'        => $proyecto->getCategory(),
-                'description' => $proyecto->getDescription(),
+                'id'          => $cause->getId(),
+                'name'        => $cause->getName(),
+                'description' => $cause->getDescription(),
+                'risks'      => $risks,
             ];
         }
         return $result;
@@ -79,8 +88,8 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
     public function getById($id): array
     {
         $entityManager = $this->getEntityManager();
-        $proyectos = $this->createQueryBuilder('p')
-            ->leftJoin('p.users', 'u')
+        $causes = $this->createQueryBuilder('p')
+            ->leftJoin('p.riesgos', 'u')
             ->addSelect('u')
             ->where('p.id = :id')
             ->setParameter('id', $id)
@@ -88,21 +97,20 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
             ->getResult();
 
         $result = [];
-        foreach ($proyectos as $proyecto) {
-            $responsibles = [];
-            foreach ($proyecto->getUsers() as $user) {
-                $responsibles[] = [
-                    'id'     => $user->getId(),
-                    'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
-                    'dependence' => $user->getIdDependencia()->getDescripcion(), 
-                    'position'   => $user->getIdCargo()->getDescripcion(),   
+        foreach ($causes as $cause) {
+            $risks = [];
+            foreach ($cause->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'description' => $risk->getDescription(),
                 ];
             }
             $result[] = [
-                'id'          => $proyecto->getId(),
-                'name'        => $proyecto->getName(),
-                'descripcion' => $proyecto->getDescripcion(),
-                'responsibles' => $responsibles,
+                'id'          => $cause->getId(),
+                'name'        => $cause->getName(),
+                'description' => $cause->getDescription(),
+                'risks'      => $risks,
             ];
         }
         return $result;

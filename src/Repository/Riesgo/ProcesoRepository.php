@@ -53,7 +53,12 @@ class ProcesoRepository extends ServiceEntityRepository
                 }
             }
 
-            $entity->setCreateAt(new \DateTime());
+            foreach ($data["risks"] as $key => $value) {
+                $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
+                if ($risk) {
+                    $entity->addRiesgo($risk);
+                }
+            }
 
             $entityManager->persist($entity);
             $entityManager->flush();
@@ -67,19 +72,28 @@ class ProcesoRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $procesos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
-            ->addSelect('u')
+            ->leftJoin('p.riesgos', 'r')
+            ->addSelect('u', 'r')
             ->getQuery()
             ->getResult();
 
         $result = [];
         foreach ($procesos as $proceso) {
             $responsibles = [];
+            $risks = [];
             foreach ($proceso->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
                     'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
                     'dependence' => $user->getIdDependencia()->getDescripcion(), 
                     'position'   => $user->getIdCargo()->getDescripcion(),   
+                ];
+            }
+            foreach ($proceso->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'description' => $risk->getDescription(),
                 ];
             }
             $result[] = [
@@ -92,6 +106,7 @@ class ProcesoRepository extends ServiceEntityRepository
                 'unit'   => $proceso->getUnit(),
                 'descripcion' => $proceso->getDescription(),
                 'responsibles' => $responsibles,
+                'risks' => $risks,
             ];
         }
         return $result;

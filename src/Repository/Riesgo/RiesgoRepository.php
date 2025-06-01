@@ -29,7 +29,7 @@ class RiesgoRepository extends ServiceEntityRepository
      * Create Riesgo.
      */
     public function post($data,$validator,$helper): JsonResponse  {
-
+       
         $entityManager = $this->getEntityManager();
         $entity=$helper->setParametersToEntity(new Riesgo(),$data);
 
@@ -53,7 +53,21 @@ class RiesgoRepository extends ServiceEntityRepository
                 }
             }
 
-            $entity->setCreateAt(new \DateTime());
+            // Itera sobre las Causas y asocia cada uno con la entidad Riesgo
+            foreach ($data["causes"] as $key => $value) {
+                $cause = $entityManager->getRepository(\App\Entity\Riesgo\CausaConsecuencia::class)->find($value['id']);
+                if ($cause) {
+                    $entity->addCausaConsecuencia($cause);
+                }
+            }
+
+            // Itera sobre los procesos y asocia cada uno con la entidad Riesgo
+            foreach ($data["processes"] as $key => $value) {
+                $process = $entityManager->getRepository(\App\Entity\Riesgo\Proceso::class)->find($value['id']);
+                if ($process) {
+                    $entity->addProceso($process);
+                }
+            }
 
             $entityManager->persist($entity);
             $entityManager->flush();
@@ -74,6 +88,8 @@ class RiesgoRepository extends ServiceEntityRepository
         $result = [];
         foreach ($riesgos as $riesgo) {
             $responsibles = [];
+            $processes = [];
+            $causes = [];
             foreach ($riesgo->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -82,11 +98,27 @@ class RiesgoRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
+            foreach ($riesgo->getCausaConsecuencias() as $cause) {
+                $causes[] = [
+                    'id'          => $cause->getId(),
+                    'name'        => $cause->getName(),
+                    'description' => $cause->getDescription(),
+                ];
+            }
+            foreach ($riesgo->getProcesos() as $process) {
+                $processes[] = [
+                    'id'          => $process->getId(),
+                    'name'        => $process->getName(),
+                    'description' => $process->getDescription(),
+                ];
+            }
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
-                'descripcion' => $riesgo->getDescripcion(),
+                'description' => $riesgo->getDescription(),
                 'responsibles' => $responsibles,
+                'processes' => $processes,
+                'causes' => $causes,
             ];
         }
         return $result;
@@ -106,6 +138,8 @@ class RiesgoRepository extends ServiceEntityRepository
         $result = [];
         foreach ($riesgos as $riesgo) {
             $responsibles = [];
+            $processes = [];
+            $causes = [];
             foreach ($riesgo->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -114,11 +148,27 @@ class RiesgoRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
+            foreach ($riesgo->getCausaConsecuencias() as $cause) {
+                $causes[] = [
+                    'id'          => $cause->getId(),
+                    'name'        => $cause->getName(),
+                    'description' => $cause->getDescription(),
+                ];
+            }
+            foreach ($riesgo->getProcesos() as $process) {
+                $processes[] = [
+                    'id'          => $process->getId(),
+                    'name'        => $process->getName(),
+                    'description' => $process->getDescription(),
+                ];
+            }
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
-                'descripcion' => $riesgo->getDescripcion(),
+                'description' => $riesgo->getDescription(),
                 'responsibles' => $responsibles,
+                'processes' => $processes,
+                'causes' => $causes,
             ];
         }
         return $result;

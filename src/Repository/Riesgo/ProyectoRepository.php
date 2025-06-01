@@ -53,8 +53,6 @@ class ProyectoRepository extends ServiceEntityRepository
                 }
             }
 
-            $entity->setCreateAt(new \DateTime());
-
             $entityManager->persist($entity);
             $entityManager->flush();
 
