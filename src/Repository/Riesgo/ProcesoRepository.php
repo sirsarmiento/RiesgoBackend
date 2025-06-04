@@ -126,6 +126,7 @@ class ProcesoRepository extends ServiceEntityRepository
         $result = [];
         foreach ($procesos as $proceso) {
             $responsibles = [];
+            $risks = [];
             foreach ($proceso->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -134,11 +135,24 @@ class ProcesoRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
+            foreach ($proceso->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'description' => $risk->getDescription(),
+                ];
+            }
             $result[] = [
                 'id'          => $proceso->getId(),
+                'code'          => $proceso->getCode(),
                 'name'        => $proceso->getName(),
-                'descripcion' => $proceso->getDescripcion(),
+                'category'   => $proceso->getCategory(),
+                'type'   => $proceso->getType(),
+                'process'   => $proceso->getProcess(),
+                'unit'   => $proceso->getUnit(),
+                'descripcion' => $proceso->getDescription(),
                 'responsibles' => $responsibles,
+                'risks' => $risks,
             ];
         }
         return $result;

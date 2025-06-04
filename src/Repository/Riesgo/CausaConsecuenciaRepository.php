@@ -78,7 +78,7 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
             $result[] = [
                 'id'          => $cause->getId(),
                 'name'        => $cause->getName(),
-                'description' => $cause->getDescription(),
+                'type'       => $cause->getType(),
                 'risks'      => $risks,
             ];
         }
@@ -109,7 +109,7 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
             $result[] = [
                 'id'          => $cause->getId(),
                 'name'        => $cause->getName(),
-                'description' => $cause->getDescription(),
+                'type'       => $cause->getType(),
                 'risks'      => $risks,
             ];
         }

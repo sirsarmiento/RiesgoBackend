@@ -78,6 +78,7 @@ class RiesgoRepository extends ServiceEntityRepository
 
     public function getAll(): array
     {
+  
         $entityManager = $this->getEntityManager();
         $riesgos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
@@ -102,14 +103,14 @@ class RiesgoRepository extends ServiceEntityRepository
                 $causes[] = [
                     'id'          => $cause->getId(),
                     'name'        => $cause->getName(),
-                    'description' => $cause->getDescription(),
+                    'type'       => $cause->getType(),
                 ];
             }
             foreach ($riesgo->getProcesos() as $process) {
                 $processes[] = [
                     'id'          => $process->getId(),
                     'name'        => $process->getName(),
-                    'description' => $process->getDescription(),
+                    'type'        => $process->getType(),
                 ];
             }
             $result[] = [
@@ -152,14 +153,14 @@ class RiesgoRepository extends ServiceEntityRepository
                 $causes[] = [
                     'id'          => $cause->getId(),
                     'name'        => $cause->getName(),
-                    'description' => $cause->getDescription(),
+                    'type' => $cause->getType(),
                 ];
             }
             foreach ($riesgo->getProcesos() as $process) {
                 $processes[] = [
                     'id'          => $process->getId(),
                     'name'        => $process->getName(),
-                    'description' => $process->getDescription(),
+                    'type'        => $process->getType(),
                 ];
             }
             $result[] = [
@@ -174,3 +175,5 @@ class RiesgoRepository extends ServiceEntityRepository
         return $result;
     }
 }
+
+  
