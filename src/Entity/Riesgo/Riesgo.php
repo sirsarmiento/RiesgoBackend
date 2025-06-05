@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\User;
 use App\Entity\Riesgo\CausaConsecuencia;
-
+use App\Entity\Riesgo\Control;
 /**
  * @ORM\Entity(repositoryClass=RiesgoRepository::class)
  */
@@ -91,11 +91,18 @@ class Riesgo
      */
     private Collection $causaConsecuencias;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Control::class, inversedBy="riesgos")
+     * @ORM\JoinTable(name="riesgo_control")
+     */
+    private Collection $controls;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->procesos = new ArrayCollection();
         $this->causaConsecuencias = new ArrayCollection();
+        $this->controls = new ArrayCollection();
         $this->createAt = new \DateTime();
         $this->createBy = 'System'; // Default value, can be changed later
     }
@@ -287,6 +294,28 @@ class Riesgo
     {
         if ($this->causaConsecuencias->removeElement($causaConsecuencia)) {
             $causaConsecuencia->removeRiesgo($this);
+        }
+        return $this;
+    }
+
+    public function getControls(): Collection
+    {
+        return $this->controls;
+    }
+
+    public function addControl(Control $control): self
+    {
+        if (!$this->controls->contains($control)) {
+            $this->controls[] = $control;
+            $control->addRiesgo($this);
+        }
+        return $this;
+    }
+
+    public function removeControl(Control $control): self
+    {
+        if ($this->controls->removeElement($control)) {
+            $controls->removeControl($this);
         }
         return $this;
     }

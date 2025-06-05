@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Riesgo\CausaConsecuencia;
+use App\Entity\Riesgo\Control;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Proyecto;
 use App\Entity\Riesgo\Riesgo;
@@ -80,6 +81,11 @@ class Empresa
      */
     private $causaConsecuencias;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Control::class, mappedBy="empresa")
+     */
+    private $controls;
+
 
     public function __construct()
     {
@@ -87,6 +93,7 @@ class Empresa
         $this->procesos = new ArrayCollection();
         $this->Riesgo = new ArrayCollection();
         $this->causaConsecuencias = new ArrayCollection();
+        $this->controls = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -292,6 +299,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($causaConsecuencia->getEmpresa() === $this) {
                 $causaConsecuencia->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Control[]
+     */
+    public function getControls(): Collection
+    {
+        return $this->controls;
+    }
+
+    public function addControl(Control $control): self
+    {
+        if (!$this->controls->contains($control)) {
+            $this->controls[] = $control;
+            $control->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControl(Control $control): self
+    {
+        if ($this->controls->removeElement($control)) {
+            // set the owning side to null (unless already changed)
+            if ($control->getEmpresa() === $this) {
+                $control->setEmpresa(null);
             }
         }
 
