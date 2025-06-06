@@ -6,6 +6,12 @@ use App\Entity\Riesgo\Control;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Security;
+use App\Entity\Empresa;
+Use App\Entity\User;
+
+
 /**
  * @method Control|null find($id, $lockMode = null, $lockVersion = null)
  * @method Control|null findOneBy(array $criteria, array $orderBy = null)
@@ -14,37 +20,77 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ControlRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $security;
+
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
+        $this->security = $security;
         parent::__construct($registry, Control::class);
     }
 
-    // /**
-    //  * @return Control[] Returns an array of Control objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    /**
+     * Create Control.
+     */
+    public function post($data,$validator,$helper): JsonResponse  {
 
-    /*
-    public function findOneBySomeField($value): ?Control
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $entityManager = $this->getEntityManager();
+        $entity=$helper->setParametersToEntity(new Control(),$data);
+
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            $errorsString = (string) $errors;
+            return new JsonResponse(['msg'=>$errorsString],500);
+        }else{
+            $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
+            $entity->setCreateBy($currentUser->getUserName());
+       
+            $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
+            if($empresa)
+                $entity->setEmpresa($empresa);
+            
+                foreach ($data["responsibles"] as $key => $value) {
+                $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
+                if ($user) {
+                    $entity->addUser($user);
+                }
+            }
+
+            $entityManager->persist($entity);
+            $entityManager->flush();
+
+            return new JsonResponse(['msg'=>'Registro Creado','id'=>$entity->getId()],200);
+        }
     }
-    */
+
+    public function getAll(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $controls = $this->createQueryBuilder('p')
+            ->leftJoin('p.users', 'u')
+            ->addSelect('u')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($controls as $control) {
+            $responsibles = [];
+            foreach ($control->getUsers() as $user) {
+                $responsibles[] = [
+                    'id'     => $user->getId(),
+                    'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), 
+                    'dependence' => $user->getIdDependencia()->getDescripcion(), 
+                    'position'   => $user->getIdCargo()->getDescripcion(),   
+                ];
+            }
+            $result[] = [
+                'id'          => $control->getId(),
+                'name'        => $control->getName(),
+                'qualify' => $control->getQualify(),
+                'executionType' => $control->getExecutionType(),
+                'responsibles' => $responsibles,
+            ];
+        }
+        return $result;
+    }
+
 }

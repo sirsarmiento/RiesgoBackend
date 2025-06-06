@@ -5,6 +5,8 @@ namespace App\Entity\Riesgo;
 use App\Entity\Empresa;
 use App\Repository\Riesgo\ControlRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use App\Entity\User;
 use App\Entity\Riesgo\Riesgo;
 
@@ -73,6 +75,11 @@ class Control
     /**
      * @ORM\Column(type="integer")
      */
+    private $isEvidenceEffective;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     private $correctTime;
 
     /**
@@ -111,11 +118,12 @@ class Control
      */
     private Collection $riesgos;
 
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->riesgos = new ArrayCollection();
-        $this->createAt = new \DateTime();
+        $this->createdAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
     }
 
@@ -325,7 +333,7 @@ class Control
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->addProceso($this);
+            $user->addControl($this);
         }
         return $this;
     }
@@ -333,7 +341,7 @@ class Control
     public function removeUser(User $user): self
     {
         if ($this->users->removeElement($user)) {
-            $user->removeProceso($this);
+            $user->removeControl($this);
         }
         return $this;
     }
@@ -347,7 +355,7 @@ class Control
     {
         if (!$this->riesgos->contains($riesgo)) {
             $this->riesgos[] = $riesgo;
-            $riesgo->addProceso($this);
+            $riesgo->addControl($this);
         }
         return $this;
     }
@@ -355,6 +363,18 @@ class Control
     public function removeRiesgo(Riesgo $riesgo): self
     {
         $this->riesgos->removeElement($riesgo);
+        return $this;
+    }
+
+    public function getIsEvidenceEffective(): ?int
+    {
+        return $this->isEvidenceEffective;
+    }
+
+    public function setIsEvidenceEffective(int $isEvidenceEffective): self
+    {
+        $this->isEvidenceEffective = $isEvidenceEffective;
+
         return $this;
     }
 }

@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Riesgo\Proyecto;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Riesgo;
+use App\Entity\Riesgo\Control;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -207,6 +208,11 @@ class User implements UserInterface
      */
     private Collection $riesgos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Control::class, mappedBy="users")
+     */
+    private Collection $controls;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -218,6 +224,7 @@ class User implements UserInterface
         $this->proyectos = new ArrayCollection();
         $this->procesos = new ArrayCollection();
         $this->riesgos = new ArrayCollection();
+        $this->controls = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -753,6 +760,25 @@ class User implements UserInterface
     public function removeRiesgo(Riesgo $riesgo): self
     {
         $this->riesgos->removeElement($riesgo);
+        return $this;
+    }
+
+    public function getControls(): Collection
+    {
+        return $this->controls;
+    }
+
+    public function addControl(Control $control): self
+    {
+        if (!$this->controls->contains($control)) {
+            $this->controls[] = $control;
+        }
+        return $this;
+    }
+
+    public function removeControl(Control $control): self
+    {
+        $this->controls->removeElement($control);
         return $this;
     }
 
