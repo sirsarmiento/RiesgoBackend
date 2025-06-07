@@ -60,6 +60,42 @@ class ProyectoRepository extends ServiceEntityRepository
         }    
     }
 
+    /**
+     * Update Proyecto.
+     */
+    public function put($data,$id,$validator,$helper): JsonResponse  
+    {
+        $entityManager = $this->getEntityManager();
+        $entity =$entityManager->getRepository(Proyecto::class)->find($id);
+        if (!$entity) {
+            return new JsonResponse(['msg'=>'No existen Registros con el id: '.$id],404);  
+        }
+        $entity=$helper->setParametersToEntity($entity,$data);
+        $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
+        $entity->setUpdateBy($currentUser->getUserName());
+        $entity->setUpdateAt(new \DateTime());
+
+        foreach ($data["responsibles"] as $key => $value) {
+            $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
+            if ($user && !$entity->getUsers()->contains($user)) { // Verifica si ya está asociado
+                $entity->addUser($user);
+            }
+        }
+
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            foreach ($errors as $violation) {
+                $messages[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+            return new JsonResponse($messages,500);
+        }else{
+            $entityManager->persist($entity);
+            $entityManager->flush();
+            return new JsonResponse(['msg'=>'Registro Actualizado: '.$entity->getId()],200);
+        }
+
+    }
+
     public function getAll(): array
     {
         $entityManager = $this->getEntityManager();

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Riesgo;
 
+use App\Entity\Riesgo\Proyecto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\Riesgo\ProyectoRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,6 +50,44 @@ class ProyectoController extends AbstractController
         try {
             $data = json_decode($request->getContent(),true);
             return $repository->post($data,$validator,$helper); 
+        } catch (Exception $e) {
+            return new JsonResponse(['msg'=>'Error del Servidor'],500);
+        }
+    }
+
+    
+    /**
+        * @Route("/api/proyecto/actualizar/{id}", methods={"PUT"})
+        * @OA\Put(
+         * summary="Put Proyecto",
+         * description="Update Proyecto",
+         * operationId="updateProyecto",
+         * tags={"Proyectos"},
+         * @OA\RequestBody(
+         *    required=true,
+         *    description="Data Proyecto",
+         *    @OA\JsonContent(
+         *       required={"nombre","descripcion"},
+         *       @OA\Property(property="nombre", type="string", format="string", example="Polar C.A Modificado"),
+         *       @OA\Property(property="descripcion", type="string", format="integer", example="1"),
+         *    ),
+         * ),
+         * @OA\Response(
+         *    response=422,
+         *    description="Wrong credentials response",
+         *    @OA\JsonContent(
+         *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+         *        )
+         *     )
+         * )
+    */
+    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(),true);
+            $em =$this->getDoctrine()->getManager();
+            $repository = $this->getDoctrine()->getRepository(Proyecto::class);
+            return $repository->put($data,$id,$validator,$helper); 
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }
