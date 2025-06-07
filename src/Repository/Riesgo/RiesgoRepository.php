@@ -69,6 +69,13 @@ class RiesgoRepository extends ServiceEntityRepository
                 }
             }
 
+            foreach ($data["controls"] as $key => $value) {
+                $control = $entityManager->getRepository(\App\Entity\Riesgo\Control::class)->find($value['id']);
+                if ($control) {
+                    $entity->addControl($control);
+                }
+            }
+
             $entityManager->persist($entity);
             $entityManager->flush();
 
@@ -91,6 +98,7 @@ class RiesgoRepository extends ServiceEntityRepository
             $responsibles = [];
             $processes = [];
             $causes = [];
+            $controls = [];
             foreach ($riesgo->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -113,6 +121,14 @@ class RiesgoRepository extends ServiceEntityRepository
                     'type'        => $process->getType(),
                 ];
             }
+            foreach ($riesgo->getControls() as $control) {
+                $controls[] = [
+                    'id'          => $control->getId(),
+                    'name'        => $control->getName(),
+                    'type'     => $control->getQualify(),
+                    'executionType' => $control->getExecutionType(),
+                ];
+            }
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
@@ -120,6 +136,7 @@ class RiesgoRepository extends ServiceEntityRepository
                 'responsibles' => $responsibles,
                 'processes' => $processes,
                 'causes' => $causes,
+                'controls' => $controls,
             ];
         }
         return $result;

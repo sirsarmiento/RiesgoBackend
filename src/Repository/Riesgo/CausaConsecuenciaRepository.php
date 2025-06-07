@@ -72,7 +72,8 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'description' => $risk->getDescription(),
+                    'impacto'     => $risk->getImpacto(),
+                    'frecuencia'  => $risk->getFrecuencia(),
                 ];
             }
             $result[] = [

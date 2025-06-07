@@ -48,10 +48,17 @@ class ControlRepository extends ServiceEntityRepository
             if($empresa)
                 $entity->setEmpresa($empresa);
             
-                foreach ($data["responsibles"] as $key => $value) {
+            foreach ($data["responsibles"] as $key => $value) {
                 $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
                 if ($user) {
                     $entity->addUser($user);
+                }
+            }
+
+            foreach ($data["risks"] as $key => $value) {
+                $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
+                if ($risk) {
+                    $entity->addRiesgo($risk);
                 }
             }
 
@@ -74,6 +81,7 @@ class ControlRepository extends ServiceEntityRepository
         $result = [];
         foreach ($controls as $control) {
             $responsibles = [];
+            $risks = [];
             foreach ($control->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -82,12 +90,21 @@ class ControlRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
+            foreach ($control->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'impacto'     => $risk->getImpacto(),
+                    'frecuencia'  => $risk->getFrecuencia(),
+                ];
+            }
             $result[] = [
                 'id'          => $control->getId(),
                 'name'        => $control->getName(),
                 'qualify' => $control->getQualify(),
                 'executionType' => $control->getExecutionType(),
                 'responsibles' => $responsibles,
+                'risks' => $risks,
             ];
         }
         return $result;
