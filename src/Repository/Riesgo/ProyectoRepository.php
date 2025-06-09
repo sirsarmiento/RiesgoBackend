@@ -77,7 +77,7 @@ class ProyectoRepository extends ServiceEntityRepository
 
         foreach ($data["responsibles"] as $key => $value) {
             $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
-            if ($user && !$entity->getUsers()->contains($user)) { // Verifica si ya está asociado
+            if ($user) {
                 $entity->addUser($user);
             }
         }

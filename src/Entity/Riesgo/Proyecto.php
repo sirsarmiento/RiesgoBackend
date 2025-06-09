@@ -2,11 +2,11 @@
 
 namespace App\Entity\Riesgo;
 
-use App\Entity\Empresa;
 use App\Repository\Riesgo\ProyectoRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Empresa;
 use App\Entity\User;
 /**
  * @ORM\Entity(repositoryClass=ProyectoRepository::class)

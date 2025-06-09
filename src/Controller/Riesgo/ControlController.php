@@ -2,6 +2,7 @@
 
 namespace App\Controller\Riesgo;
 
+use App\Entity\Riesgo\Control;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,10 +31,10 @@ class ControlController extends AbstractController
         *    required=true,
         *    description="Data Control",
         *    @OA\JsonContent(
-        *       required={"nombre"},
-        *       required={"descripcion"},
-        *       @OA\Property(property="nombre", type="string", example="Analista"),
-        *       @OA\Property(property="descripcion", type="string", example="Analista")
+        *       required={"name"},
+        *       required={"description"},
+        *       @OA\Property(property="name", type="string", example="Analista"),
+        *       @OA\Property(property="description", type="string", example="Analista")
         *    ),
         * ),
         * @OA\Response(
@@ -50,6 +51,43 @@ class ControlController extends AbstractController
         try {
             $data = json_decode($request->getContent(),true);
             return $repository->post($data,$validator,$helper); 
+        } catch (Exception $e) {
+            return new JsonResponse(['msg'=>'Error del Servidor'],500);
+        }
+    }
+
+    /**
+    * @Route("/api/control/actualizar/{id}", methods={"PUT"})
+    * @OA\Put(
+        * summary="Put Control",
+        * description="Update Control",
+        * operationId="updateControl",
+        * tags={"Controls"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Data Control",
+        *    @OA\JsonContent(
+        *       required={"nombre","description"},
+        *       @OA\Property(property="name", type="string", format="string", example="Polar C.A Modificado"),
+        *       @OA\Property(property="description", type="string", format="integer", example="1"),
+        *    ),
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+    */
+    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(),true);
+            $em =$this->getDoctrine()->getManager();
+            $repository = $this->getDoctrine()->getRepository(Control::class);
+            return $repository->put($data,$id,$validator,$helper); 
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }

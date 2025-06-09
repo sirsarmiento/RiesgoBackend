@@ -2,6 +2,7 @@
 
 namespace App\Controller\Riesgo;
 
+use App\Entity\Riesgo\Proceso;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\Riesgo\ProcesoRepository;
 use Symfony\Component\HttpFoundation\Request;

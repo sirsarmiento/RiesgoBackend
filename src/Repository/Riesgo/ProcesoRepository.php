@@ -91,7 +91,7 @@ class ProcesoRepository extends ServiceEntityRepository
 
         foreach ($data["risks"] as $key => $value) {
             $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
-            if ($risk && !$entity->getUsers()->contains($risk)) { // Verifica si ya está asociado
+            if ($risk) { // Verifica si ya está asociado
                 $entity->addRiesgo($risk);
             }
         }
@@ -136,7 +136,8 @@ class ProcesoRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'description' => $risk->getDescription(),
+                    'impacto'     => $risk->getImpacto(),
+                    'frecuencia'  => $risk->getFrecuencia(),
                 ];
             }
             $result[] = [
@@ -146,7 +147,7 @@ class ProcesoRepository extends ServiceEntityRepository
                 'category'   => $proceso->getCategory(),
                 'type'   => $proceso->getType(),
                 'process'   => $proceso->getProcess(),
-                //'project'   =>  $proceso->getProject()->getId(),
+                'project'   =>  $proceso->getProject() ==null ? 0 : $proceso->getProject()->getId(),
                 'unit'   => $proceso->getUnit(),
                 'description' => $proceso->getDescription(),
                 'responsibles' => $responsibles,

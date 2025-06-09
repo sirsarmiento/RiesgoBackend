@@ -2,6 +2,7 @@
 
 namespace App\Controller\Riesgo;
 
+use App\Entity\Riesgo\CausaConsecuencia;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\Riesgo\CausaConsecuenciaRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,6 +54,48 @@ class CausaConsecuenciaController extends AbstractController
         try {
             $data = json_decode($request->getContent(),true);
             return $repository->post($data,$validator,$helper); 
+        } catch (Exception $e) {
+            return new JsonResponse(['msg'=>'Error del Servidor'],500);
+        }
+    }
+
+    /**
+    * @Route("/api/causa/actualizar/{id}", methods={"PUT"})
+    * @OA\Put(
+        * summary="Put Causa",
+        * description="Update Causa",
+        * operationId="updateCausa",
+        * tags={"CausaConsecuencias"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Data Causas",
+        *    @OA\JsonContent(
+        *      required={"name"},
+        *       required={"description"},
+        *       required={"type"},
+        *       required={"category"},
+        *       @OA\Property(property="name", type="string", example="Grieta en el techo"),
+        *       @OA\Property(property="description", type="string", example="Impacto de piedra ocasiono la grieta en el techo"),
+        *       @OA\Property(property="type", type="string", example="Causa"),
+        *       @OA\Property(property="category", type="string", example="Infraestructura")
+        *    ),
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+    */
+    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(),true);
+            $em =$this->getDoctrine()->getManager();
+            $repository = $this->getDoctrine()->getRepository(CausaConsecuencia::class);
+            return $repository->put($data,$id,$validator,$helper); 
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }
