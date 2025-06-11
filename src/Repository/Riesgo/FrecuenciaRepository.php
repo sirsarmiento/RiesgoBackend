@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Riesgo;
 
-use App\Entity\Frecuencia;
-use App\Dto\FrecuenciaOutPutDto;
+use App\Entity\Riesgo\Frecuencia;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-Use App\Entity\User;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use	Doctrine\ORM\Tools\Pagination\Paginator;
+Use App\Entity\User;
 use App\Entity\Empresa;
 /**
  * @method Frecuencia|null find($id, $lockMode = null, $lockVersion = null)
@@ -26,6 +25,103 @@ class FrecuenciaRepository extends ServiceEntityRepository
     {
         $this->security = $security;
         parent::__construct($registry, Frecuencia::class);
+    }
+
+    /**
+     * Create Frecuencia.
+     */
+    public function post($data,$validator,$helper): JsonResponse  {
+
+        $entityManager = $this->getEntityManager();
+        $entity=$helper->setParametersToEntity(new Frecuencia(),$data);
+
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            $errorsString = (string) $errors;
+            return new JsonResponse(['msg'=>$errorsString],500);
+        }else{
+            $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
+            $entity->setCreateBy($currentUser->getUserName());
+       
+            $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
+            
+            if($empresa)
+                $entity->setIdEmpresa($empresa);  
+
+            $entityManager->persist($entity);
+            $entityManager->flush();
+
+            return new JsonResponse(['msg'=>'Registro Creado','id'=>$entity->getId()],200);
+        }    
+    }
+
+    /**
+     * Update Frecuencia.
+     */
+    public function put($data,$id,$validator,$helper): JsonResponse  
+    {
+        $entityManager = $this->getEntityManager();
+        $entity =$entityManager->getRepository(Frecuencia::class)->find($id);
+        if (!$entity) {
+            return new JsonResponse(['msg'=>'No existen Registros con el id: '.$id],404);  
+        }
+        $entity=$helper->setParametersToEntity($entity,$data);
+        $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
+        $entity->setUpdateBy($currentUser->getUserName());
+        $entity->setUpdateAt(new \DateTime());
+
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            foreach ($errors as $violation) {
+                $messages[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+            return new JsonResponse($messages,500);
+        }else{
+            $entityManager->persist($entity);
+            $entityManager->flush();
+            return new JsonResponse(['msg'=>'Registro Actualizado: '.$entity->getId()],200);
+        }
+
+    }
+
+    public function getAll(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $frecuencias = $this->createQueryBuilder('p')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($frecuencias as $frecuencia) {
+            $result[] = [
+                'id'         => $frecuencia->getId(),
+                'descripcion'=> $frecuencia->getDescripcion(),
+                'peso'       => $frecuencia->getPeso(),
+                'porcentaje' => $frecuencia->getPorcentaje()
+            ];
+        }
+        return $result;
+    }
+
+    public function getById($id): array
+    {
+        $entityManager = $this->getEntityManager();
+        $frecuencias = $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+           foreach ($frecuencias as $frecuencia) {
+            $result[] = [
+                'id'         => $frecuencia->getId(),
+                'descripcion'=> $frecuencia->getDescripcion(),
+                'peso'       => $frecuencia->getPeso(),
+                'porcentaje' => $frecuencia->getPorcentaje()
+            ];
+        }
+        return $result;
     }
 
 }

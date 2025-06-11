@@ -2,9 +2,8 @@
 
 namespace App\Controller\Riesgo;
 
-use App\Entity\Frecuencia;
-use App\Dto\FrecuenciaOutPutDto;
-use App\Repository\FrecuenciaRepository;
+use App\Entity\Riesgo\Frecuencia;
+use App\Repository\Riesgo\FrecuenciaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,86 +21,23 @@ use Symfony\Component\Validator\Constraints\Json;
 class FrecuenciaController extends AbstractController
 {
 
-    public function pagined(Request $request,FrecuenciaRepository $repository): JsonResponse
-    {
-        $param = json_decode($request->getContent(),true);
-
-        $data = $repository
-        ->findPagined($param);
-        if (!$data) {
-            return new JsonResponse(['msg'=>'No existen Registros'],200);  
-        }   
-         return new JsonResponse($data,200);  
-    }
-
-
     /**
-    * @Route("/api/Frecuencia/all", methods={"GET"})
-    * @OA\Get(
-        * summary="Frecuencia All",
-        * description="Frecuencia All",
-        * operationId="Frecuenciaall",
-        * tags={"Frecuencias"},
-        * @OA\Response(
-        *    response=422,
-        *    description="Wrong credentials response",
-        *    @OA\JsonContent(
-        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
-        *        )
-        *     )
-        * )
-    */    
-    public function findAll(Request $request,FrecuenciaRepository $repository): JsonResponse
-    {
-        $param = json_decode($request->getContent(),true);
-
-        $data = $repository
-        ->findAllPage($param);
-        if (!$data) {
-            return new JsonResponse(['msg'=>'No existen Registros'],200);  
-        }   
-         return new JsonResponse($data,200);  
-    }
-
-
-     /**
-     *  Get list Frecuencias. 
-     * @Route("/api/Frecuencia/list", methods={"GET"})
-     * @OA\Response(
-     *     response=200,
-     *     description="Returns Frecuencias",
-     *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=FrecuenciaOutPutDto::class))
-     *     )
-     * )
-     * @OA\Tag(name="Frecuencias")
-     * @Security(name="Bearer")
-     */
-    public function findList(Request $request,FrecuenciaRepository $repository): JsonResponse
-    {
-        $data = $repository
-        ->findList();
-        if (!$data) {
-            return new JsonResponse(['msg'=>'No existen Registros'],200);  
-        }   
-         return new JsonResponse($data,200);  
-    }
-    
-    /**
-    * @Route("/api/Frecuencia", methods={"POST"})
+    * @Route("/api/frecuencia", methods={"POST"})
     * @OA\Post(
         * summary="Create Frecuencia",
         * description="Create Frecuencia",
         * operationId="createFrecuencia",
         * tags={"Frecuencias"},
-        * @OA\RequestBody(
+         * @OA\RequestBody(
         *    required=true,
-        *    description="Data Frecuencia",
+        *    description="Data Proyecto",
         *    @OA\JsonContent(
-        *       required={"descripcion"},
-        *       @OA\Property(property="descripcion", type="string", example="Analista"),
-        *       @OA\Property(property="nivel", type="integer", example="1")
+        *       required={"description"},
+        *       required={"peso"},
+        *       required={"porcentaje"},
+        *       @OA\Property(property="descripcion", type="string", example="Probable"),
+        *       @OA\Property(property="peso", type="string", example="1"),
+        *       @OA\Property(property="porcentaje", type="string", example="20")
         *    ),
         * ),
         * @OA\Response(
@@ -123,22 +59,23 @@ class FrecuenciaController extends AbstractController
         }
     }
 
-
-        
     /**
-    * @Route("/api/Frecuencia/{id}", methods={"PUT"})
+    * @Route("/api/frecuencia/actualizar/{id}", methods={"PUT"})
     * @OA\Put(
-        * summary="Actualiza Frecuencia",
-        * description="ActualizaFrecuencia",
-        * operationId="actualizafrecuencia",
+        * summary="Put Frecuencia",
+        * description="Update Frecuencia",
+        * operationId="updateFrecuencia",
         * tags={"Frecuencias"},
         * @OA\RequestBody(
         *    required=true,
-        *    description="Actualiza Frecuencia",
+        *    description="Data Proyecto",
         *    @OA\JsonContent(
-        *       required={"descripcion"},
-        *       @OA\Property(property="descripcion", type="string", example="Analista"),
-        *       @OA\Property(property="nivel", type="integer", example="1")
+        *       required={"description"},
+        *       required={"peso"},
+        *       required={"porcentaje"},
+        *       @OA\Property(property="descripcion", type="string", example="Probable"),
+        *       @OA\Property(property="peso", type="string", example="1"),
+        *       @OA\Property(property="porcentaje", type="string", example="20")
         *    ),
         * ),
         * @OA\Response(
@@ -150,14 +87,75 @@ class FrecuenciaController extends AbstractController
         *     )
         * )
     */
-    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper,FrecuenciaRepository $repository): JsonResponse
-    {   
+    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper): JsonResponse
+    {
         try {
             $data = json_decode($request->getContent(),true);
-            return $repository->put($data,$id,$validator,$helper);
+            $em =$this->getDoctrine()->getManager();
+            $repository = $this->getDoctrine()->getRepository(Frecuencia::class);
+            return $repository->put($data,$id,$validator,$helper); 
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }
+    }
+
+   /**
+    *  Get All Frecuencia.
+    * @Route("/api/frecuencia", methods={"GET"})
+    * @OA\Post(
+        * summary="Frecuencias",
+        * description="Lista todo",
+        * operationId="AllFrecuencia",
+        * tags={"Frecuencias"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Consulta todos los frecuencia",
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+        * @OA\Tag(name="Frecuencias")
+        * @Security(name="Bearer")
+    */   
+    public function findAll(Request $request,FrecuenciaRepository $repository): JsonResponse
+    {
+        $data = $repository->getall();
+        return new JsonResponse($data, 200);
+    }
+
+
+    /**
+    *  Get Frecuencia By Id.
+    * @Route("/api/frecuencia/{id}", methods={"GET"})
+    * @OA\Post(
+        * summary="Frecuencias",
+        * description="Frecuencia por Id",
+        * operationId="FrecuenciaById",
+        * tags={"Frecuencias"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Consulta de frecuencia por Id",
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+        * @OA\Tag(name="Frecuencias")
+        * @Security(name="Bearer")
+    */   
+    public function findById($id,Request $request,FrecuenciaRepository $repository): JsonResponse
+    {
+        $data = $repository->getById($id);
+        return new JsonResponse($data, 200);
     }
 
 

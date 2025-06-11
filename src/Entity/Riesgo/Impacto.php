@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Riesgo;
 
 use App\Entity\Empresa;
-use App\Repository\CargoRepository;
+use App\Repository\Riesgo\ImpactoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,6 +24,16 @@ class Impacto
      * @ORM\Column(type="string", length=100)
      */
     private $descripcion;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $peso;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $porcentaje;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -52,6 +62,8 @@ class Impacto
 
     public function __construct()
     {
+        $this->createAt = new \DateTime();
+        $this->updateBy = "system"; // Initially no updates
     }
 
     public function getId(): ?int
@@ -67,6 +79,30 @@ class Impacto
     public function setDescripcion(string $descripcion): self
     {
         $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    public function getPeso(): ?Int
+    {
+        return $this->peso;
+    }
+
+    public function setPeso(int $peso): self
+    {
+        $this->peso = $peso;
+
+        return $this;
+    }
+
+    public function getPorcentaje(): ?int
+    {
+        return $this->porcentaje;
+    }
+
+    public function setPorcentaje(int $porcentaje): self
+    {
+        $this->porcentaje = $porcentaje;
 
         return $this;
     }

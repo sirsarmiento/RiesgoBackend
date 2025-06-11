@@ -132,6 +132,8 @@ class RiesgoRepository extends ServiceEntityRepository
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
+                'impact'        => $riesgo->getImpacto(),
+                'frecuence'        => $riesgo->getFrecuencia(),
                 'description' => $riesgo->getDescription(),
                 'responsibles' => $responsibles,
                 'processes' => $processes,
