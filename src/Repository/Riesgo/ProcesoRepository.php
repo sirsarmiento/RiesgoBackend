@@ -136,8 +136,8 @@ class ProcesoRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impacto'     => $risk->getImpacto(),
-                    'frecuencia'  => $risk->getFrecuencia(),
+                    'impact'        => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
+                    'frequency'        => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
                 ];
             }
             $result[] = [
@@ -184,7 +184,8 @@ class ProcesoRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'description' => $risk->getDescription(),
+                    'impact'        => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
+                    'frequency'        => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
                 ];
             }
             $result[] = [

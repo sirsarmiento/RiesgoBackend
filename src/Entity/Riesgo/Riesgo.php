@@ -29,16 +29,6 @@ class Riesgo
     private $name;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $impacto;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $frecuencia;
-
-    /**
      * @ORM\Column(type="string", length=1000, nullable=true)
      */
     private $description;
@@ -97,6 +87,18 @@ class Riesgo
      */
     private Collection $controls;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Impacto::class, inversedBy="riesgos")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $impact;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Frecuencia::class, inversedBy="riesgos")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $frequency;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -124,26 +126,26 @@ class Riesgo
         return $this;
     }
 
-    public function getImpacto(): ?int
+    public function getImpact(): ?Impacto
     {
-        return $this->impacto;
+        return $this->impact;
     }
 
-    public function setImpacto(int $impacto): self
+    public function setImpact(?Impacto $impact): self
     {
-        $this->impacto = $impacto;
+        $this->impact = $impact;
 
         return $this;
     }
 
-    public function getFrecuencia(): ?int
+    public function getFrequency(): ?Frecuencia
     {
-        return $this->frecuencia;
+        return $this->frequency;
     }
 
-    public function setFrecuencia(int $frecuencia): self
+    public function setFrequency(?Frecuencia $frequency): self
     {
-        $this->frecuencia = $frecuencia;
+        $this->frequency = $frequency;
 
         return $this;
     }

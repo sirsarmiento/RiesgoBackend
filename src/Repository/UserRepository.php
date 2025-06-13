@@ -1184,7 +1184,7 @@ class UserRepository extends ServiceEntityRepository
 
     }    
     
-        /**
+    /**
      * Listar Correo subject.
      */
     public function findListSubject()
@@ -1208,6 +1208,25 @@ class UserRepository extends ServiceEntityRepository
        return array("data"=>$dataSubject);
     }
 
+    public function getAll(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $users = $this->createQueryBuilder('p')
+            ->getQuery()
+            ->getResult();
 
+        $result = [];
+        foreach ($users as $user) {
+            $result[] = [
+                'id'    => $user->getId(),
+                'name'  =>  $user->getPrimerNombre(), 
+                'lastName'  =>    $user->getPrimerApellido(),
+                'dependence'  => $user->getIdDependencia() == null ? 0 : $user->getIdDependencia()->getDescripcion(),
+                'position' => $user->getIdCargo() == null ? 0 : $user->getIdCargo()->getDescripcion()
+            ];
+        }
+        return $result;
+    }
+ 
 }
 

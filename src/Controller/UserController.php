@@ -1047,4 +1047,33 @@ class UserController extends AbstractController
          return new JsonResponse($data,200);  
     }
 
+    /**
+    *  Get All Responsibles.
+    * @Route("/api/user", methods={"GET"})
+    * @OA\Post(
+        * summary="User",
+        * description="Lista todo",
+        * operationId="AllUser",
+        * tags={"Users"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Consulta todos los usuarios",
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+        * @OA\Tag(name="Users")
+        * @Security(name="Bearer")
+    */   
+    public function findAllResponsibles(Request $request,UserRepository $repository): JsonResponse
+    {
+        $data = $repository->getall();
+        return new JsonResponse($data, 200);
+    }
+
 }

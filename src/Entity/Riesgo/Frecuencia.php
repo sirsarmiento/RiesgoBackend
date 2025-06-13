@@ -60,10 +60,16 @@ class Frecuencia
      */
     private $idempresa;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Riesgo::class, mappedBy="frequency")
+     */
+    private $riesgos;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
         $this->updateBy = "system";
+        $this->riesgos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +169,36 @@ class Frecuencia
     public function setIdempresa(?Empresa $idempresa): self
     {
         $this->idempresa = $idempresa;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Riesgo[]
+     */
+    public function getRiesgos(): Collection
+    {
+        return $this->riesgos;
+    }
+
+    public function addRiesgo(Riesgo $riesgo): self
+    {
+        if (!$this->riesgos->contains($riesgo)) {
+            $this->riesgos[] = $riesgo;
+            $riesgo->setFrequency($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRiesgo(Riesgo $riesgo): self
+    {
+        if ($this->riesgos->removeElement($riesgo)) {
+            // set the owning side to null (unless already changed)
+            if ($riesgo->getFrequency() === $this) {
+                $riesgo->setFrequency(null);
+            }
+        }
 
         return $this;
     }

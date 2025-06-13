@@ -60,10 +60,16 @@ class Impacto
      */
     private $idempresa;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Riesgo::class, mappedBy="impact")
+     */
+    private $riesgos;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
         $this->updateBy = "system"; // Initially no updates
+        $this->riesgos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +169,36 @@ class Impacto
     public function setIdempresa(?Empresa $idempresa): self
     {
         $this->idempresa = $idempresa;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Riesgo[]
+     */
+    public function getRiesgos(): Collection
+    {
+        return $this->riesgos;
+    }
+
+    public function addRiesgo(Riesgo $riesgo): self
+    {
+        if (!$this->riesgos->contains($riesgo)) {
+            $this->riesgos[] = $riesgo;
+            $riesgo->setImpact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRiesgo(Riesgo $riesgo): self
+    {
+        if ($this->riesgos->removeElement($riesgo)) {
+            // set the owning side to null (unless already changed)
+            if ($riesgo->getImpact() === $this) {
+                $riesgo->setImpact(null);
+            }
+        }
 
         return $this;
     }

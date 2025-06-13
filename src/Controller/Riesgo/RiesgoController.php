@@ -2,6 +2,7 @@
 
 namespace App\Controller\Riesgo;
 
+use App\Entity\Riesgo\Riesgo;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\Riesgo\RiesgoRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,6 +50,44 @@ class RiesgoController extends AbstractController
         try {
             $data = json_decode($request->getContent(),true);
             return $repository->post($data,$validator,$helper); 
+        } catch (Exception $e) {
+            return new JsonResponse(['msg'=>'Error del Servidor'],500);
+        }
+    }
+
+    /**
+        * @Route("/api/riesgo/actualizar/{id}", methods={"PUT"})
+        * @OA\Put(
+        * summary="Put Riesgo",
+        * description="Update Riesgo",
+        * operationId="updateRiesgo",
+        * tags={"Riesgos"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Data Riesgo",
+        *    @OA\JsonContent(
+        *       required={"name"},
+        *       required={"description"},
+        *       @OA\Property(property="name", type="string", example="Analista"),
+        *       @OA\Property(property="description", type="string", example="Analista")
+        *    ),
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+    */
+    public function put($id,Request $request,ValidatorInterface $validator,Helper $helper): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(),true);
+            $em =$this->getDoctrine()->getManager();
+            $repository = $this->getDoctrine()->getRepository(Riesgo::class);
+            return $repository->put($data,$id,$validator,$helper); 
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }

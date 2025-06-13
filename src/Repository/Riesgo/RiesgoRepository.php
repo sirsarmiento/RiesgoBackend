@@ -83,6 +83,65 @@ class RiesgoRepository extends ServiceEntityRepository
         }    
     }
 
+    /**
+     * Update Causa.
+     */
+    public function put($data,$id,$validator,$helper): JsonResponse  
+    {
+        $entityManager = $this->getEntityManager();
+        $entity =$entityManager->getRepository(Riesgo::class)->find($id);
+        if (!$entity) {
+            return new JsonResponse(['msg'=>'No existen Registros con el id: '.$id],404);  
+        }
+        $entity=$helper->setParametersToEntity($entity,$data);
+        $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
+        $entity->setUpdateBy($currentUser->getUserName());
+        $entity->setUpdateAt(new \DateTime());
+
+        foreach ($data["responsibles"] as $key => $value) {
+            $user = $entityManager->getRepository(\App\Entity\User::class)->find($value['id']);
+            if ($user) {
+                $entity->addUser($user);
+            }
+        }
+
+        // Itera sobre las Causas y asocia cada uno con la entidad Riesgo
+        foreach ($data["causes"] as $key => $value) {
+            $cause = $entityManager->getRepository(\App\Entity\Riesgo\CausaConsecuencia::class)->find($value['id']);
+            if ($cause) {
+                $entity->addCausaConsecuencia($cause);
+            }
+        }
+
+        // Itera sobre los procesos y asocia cada uno con la entidad Riesgo
+        foreach ($data["processes"] as $key => $value) {
+            $process = $entityManager->getRepository(\App\Entity\Riesgo\Proceso::class)->find($value['id']);
+            if ($process) {
+                $entity->addProceso($process);
+            }
+        }
+
+        foreach ($data["controls"] as $key => $value) {
+            $control = $entityManager->getRepository(\App\Entity\Riesgo\Control::class)->find($value['id']);
+            if ($control) {
+                $entity->addControl($control);
+            }
+        }
+
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            foreach ($errors as $violation) {
+                $messages[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+            return new JsonResponse($messages,500);
+        }else{
+            $entityManager->persist($entity);
+            $entityManager->flush();
+            return new JsonResponse(['msg'=>'Registro Actualizado: '.$entity->getId()],200);
+        }
+
+    }
+
     public function getAll(): array
     {
   
@@ -132,9 +191,12 @@ class RiesgoRepository extends ServiceEntityRepository
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
-                'impact'        => $riesgo->getImpacto(),
-                'frecuence'        => $riesgo->getFrecuencia(),
+                'impact'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
+                'impactName'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getDescripcion(),
+                'frequency'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
+                'frequencyName'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getDescripcion(),
                 'description' => $riesgo->getDescription(),
+                'affect'      => $riesgo->getAffect(),
                 'responsibles' => $responsibles,
                 'processes' => $processes,
                 'causes' => $causes,
@@ -186,7 +248,10 @@ class RiesgoRepository extends ServiceEntityRepository
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
                 'description' => $riesgo->getDescription(),
-                'responsibles' => $responsibles,
+                'affect'      => $riesgo->getAffect(),
+                'impact'      => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
+                'frequency'   => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
+                'responsibles'=> $responsibles,
                 'processes' => $processes,
                 'causes' => $causes,
             ];
