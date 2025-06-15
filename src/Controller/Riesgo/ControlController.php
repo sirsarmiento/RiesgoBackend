@@ -151,4 +151,30 @@ class ControlController extends AbstractController
         $data = $repository->getById($id);
         return new JsonResponse($data, 200);
     }
+
+    /**
+     * @Route("/api/control/{id}/remove-user/{userId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a user from a control",
+     *     tags={"Controls"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or Control not found"
+     *     )
+     * )
+     */
+    public function removeUserFromControl(
+            int $id,
+            int $userId,
+            ControlRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeUserFromControl($id, $userId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
 }

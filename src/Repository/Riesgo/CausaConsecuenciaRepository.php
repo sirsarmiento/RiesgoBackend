@@ -168,21 +168,41 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
     /**
      * Delete.
      */
-    public function removeRiesgoFromCausa($causaId, $riesgoId): JsonResponse
+    public function removeRiesgoFromCausa($causaId, $riskId): array
     {
-        $entityManager = $this->getEntityManager();
+        $em = $this->getEntityManager();
 
-        $causa = $entityManager->getRepository(CausaConsecuencia::class)->find($causaId);
-        $riesgo = $entityManager->getRepository(Riesgo::class)->find($riesgoId);
+        // Buscar las entidades por su ID
+        $causa = $em->getRepository(CausaConsecuencia::class)->find($causaId);
+        $riesgo = $em->getRepository(Riesgo::class)->find($riskId);
 
+        // Validar existencia
         if (!$causa || !$riesgo) {
-            return new JsonResponse(['msg' => 'No se encontró alguna de las entidades.'], 404);
+             return [
+                'success' => false,
+                'message' => 'Causa o riesgo no encontrado.',
+                'code' => 404
+            ];
         }
 
-        $causa->removeRiesgo($riesgo);
-        $entityManager->persist($causa); // opcional pero seguro
-        $entityManager->flush();
+        // Validar que el riesgo esté vinculado a la causa
+        if (!$causa->getRiesgos()->contains($riesgo)) {
+            return [
+                'success' => false,
+                'message' => 'El riesgo no está asignado a esta causa.',
+                'code' => 404
+            ];
+        }
 
-        return new JsonResponse(['success' => true]);
+        // Remover la relación
+        $causa->removeRiesgo($riesgo);
+        $riesgo->removeCausaConsecuencia($causa);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
     }
 }

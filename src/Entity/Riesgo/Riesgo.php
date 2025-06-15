@@ -317,7 +317,7 @@ class Riesgo
     public function removeControl(Control $control): self
     {
         if ($this->controls->removeElement($control)) {
-            $controls->removeControl($this);
+            $control->removeRiesgo($this);
         }
         return $this;
     }

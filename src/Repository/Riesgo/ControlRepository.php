@@ -162,4 +162,45 @@ class ControlRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /**
+     * Delete.
+     */
+    public function removeUserFromControl($controlId, $userId): array
+    {
+        $em = $this->getEntityManager();
+
+        // Buscar las entidades por su ID
+        $control = $em->getRepository(Control::class)->find($controlId);
+        $user = $em->getRepository(User::class)->find($userId);
+
+        // Validar existencia
+        if (!$control || !$user) {
+            return [
+                'success' => false,
+                'message' => 'Control o usuario no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el usuario esté vinculado al control
+        if (!$control->getUsers()->contains($user)) {
+             return [
+                'success' => false,
+                'message' => 'El responsable no está asignado a este control.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $control->removeUser($user);
+        $user->removeControl($control);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
+
 }

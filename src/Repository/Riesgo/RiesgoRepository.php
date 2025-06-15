@@ -3,6 +3,8 @@
 namespace App\Repository\Riesgo;
 
 use App\Entity\Riesgo\Riesgo;
+use App\Entity\Riesgo\Proceso;
+use App\Entity\Riesgo\Control;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -279,6 +281,129 @@ class RiesgoRepository extends ServiceEntityRepository
             ];
         }
         return $result;
+    }
+
+    /**
+     * Delete user from riesgo.
+     */
+    public function removeUserFromRisk($riskId, $userId): array
+    {
+        $em = $this->getEntityManager();
+
+        // Buscar las entidades por su ID
+        $risk= $em->getRepository(Riesgo::class)->find($riskId);
+        $user = $em->getRepository(User::class)->find($userId);
+
+        // Validar existencia
+        if (!$risk || !$user) {
+            return [
+                'success' => false,
+                'message' => 'Riesgo o responsable no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el usuario esté vinculado al proceso
+        if (!$risk->getUsers()->contains($user)) {
+           return [
+                'success' => false,
+                'message' => 'El responsable no está asignado a este riesgo.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $risk->removeUser($user);
+        $user->removeRiesgo($risk);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
+
+    /**
+     * Delete process from riesgo.
+     */
+    public function removeProcessFromRisk($riskId, $processId): array
+    {
+        $em = $this->getEntityManager();
+
+        // Buscar las entidades por su ID
+        $risk= $em->getRepository(Riesgo::class)->find($riskId);
+        $process = $em->getRepository(Proceso::class)->find($processId);
+
+        // Validar existencia
+        if (!$risk || !$process) {
+            return [
+                'success' => false,
+                'message' => 'Riesgo o proceso no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el usuario esté vinculado al proceso
+        if (!$risk->getProcesos()->contains($process)) {
+            return [
+                'success' => false,
+                'message' => 'El proceso no está asignado a este riesgo.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $risk->removeProceso($process);
+        $process->removeRiesgo($risk);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
+
+    /**
+     * Delete control from riesgo.
+     */
+    public function removeControlFromRisk($riskId, $controlId): array
+    {
+        $em = $this->getEntityManager();
+   
+        // Buscar las entidades por su ID
+        $risk= $em->getRepository(Riesgo::class)->find($riskId);
+        $control = $em->getRepository(Control::class)->find($controlId);
+
+        // Validar existencia
+        if (!$risk || !$control) {
+            return [
+                'success' => false,
+                'message' => 'Riesgo o control no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el usuario esté vinculado al proceso
+        if (!$risk->getControls()->contains($control)) {
+            return [
+                'success' => false,
+                'message' => 'El control no está asignado a este riesgo.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $risk->removeControl($control);
+        $control->removeRiesgo($risk);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
     }
 }
 

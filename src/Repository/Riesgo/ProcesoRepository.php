@@ -203,4 +203,45 @@ class ProcesoRepository extends ServiceEntityRepository
         }
         return $result;
     }
+
+    /**
+     * Delete.
+     */
+    public function removeUserFromProceso($procesoId, $userId): array
+    {
+        $em = $this->getEntityManager();
+
+        // Buscar las entidades por su ID
+        $proceso= $em->getRepository(Proceso::class)->find($procesoId);
+        $user = $em->getRepository(User::class)->find($userId);
+
+        // Validar existencia
+        if (!$proceso || !$user) {
+            return [
+                'success' => false,
+                'message' => 'Proceso o responsable no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el usuario esté vinculado al proceso
+        if (!$proceso->getUsers()->contains($user)) {
+            return [
+                'success' => false,
+                'message' => 'El responsable no está asignado a este proceso.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $proceso->removeUser($user);
+        $user->removeProceso($proceso);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
 }

@@ -162,7 +162,7 @@ class CausaConsecuenciaController extends AbstractController
 
     
     /**
-    * @Route("/api/causa/{causaId}/riesgo/{riesgoId}", methods={"DELETE"})
+    * @Route("/api/causa/{id}/riesgo/{riesgoId}", methods={"DELETE"})
     * @OA\Delete(
         * summary="Eliminar asociación entre Causa y Riesgo",
         * description="Elimina el vínculo entre una causa y un riesgo mediante sus IDs",
@@ -177,13 +177,13 @@ class CausaConsecuenciaController extends AbstractController
         *     )
         * )
     */
-    public function delete(int $causaId, int $riesgoId, CausaConsecuenciaRepository $repository): Response
-    {
-        try {
-            $data = $repository->removeRiesgoFromCausa($causaId, $causaId);
-            return new JsonResponse(['msg' => 'Asociación eliminada con éxito.'], 200);
-        } catch (Exception $e) {
-            return new JsonResponse(['msg'=>'Error del Servidor'],500);
-        }
+    public function removeRiesgoFromCausa(
+            int $id,
+            int $riesgoId,
+            CausaConsecuenciaRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeRiesgoFromCausa($id, $riesgoId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
     }
 }

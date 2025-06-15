@@ -171,18 +171,20 @@ class ProyectoRepository extends ServiceEntityRepository
 
         // Validar existencia
         if (!$proyecto || !$user) {
-            return new JsonResponse([
+            return [
                 'success' => false,
-                'message' => 'Proyecto o usuario no encontrado.'
-            ], 404);
+                'message' => 'Proyecto o responsable no encontrado.',
+                'code' => 404
+            ];
         }
 
         // Validar que el usuario esté vinculado al proyecto
         if (!$proyecto->getUsers()->contains($user)) {
-            return new JsonResponse([
+           return [
                 'success' => false,
-                'message' => 'El usuario no está asignado a este proyecto.'
-            ], 404);
+                'message' => 'El responsable no está asignado a este proyecto.',
+                'code' => 404
+            ];
         }
 
         // Remover la relación
@@ -195,6 +197,5 @@ class ProyectoRepository extends ServiceEntityRepository
             'success' => true,
             'code' => 200
         ];
-
     }
 }

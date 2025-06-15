@@ -167,4 +167,30 @@ class ProcesoController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
+    /**
+     * @Route("/api/proceso/{id}/remove-user/{userId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a user from a proceso",
+     *     tags={"Procesos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or Proceso not found"
+     *     )
+     * )
+     */
+    public function removeUserFromProceso(
+            int $id,
+            int $userId,
+            ProcesoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeUserFromProceso($id, $userId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
+
 }

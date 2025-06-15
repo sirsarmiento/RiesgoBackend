@@ -181,4 +181,82 @@ class RiesgoController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
+    /**
+     * @Route("/api/riesgo/{id}/remove-user/{userId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a user from a riesgo",
+     *     tags={"Riesgos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or Riesgo not found"
+     *     )
+     * )
+     */
+    public function removeUserFromRisk(
+            int $id,
+            int $userId,
+            RiesgoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeUserFromRisk($id, $userId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
+
+    /**
+     * @Route("/api/riesgo/{id}/remove-process/{processId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a process from a riesgo",
+     *     tags={"Riesgos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Process or Risk not found"
+     *     )
+     * )
+     */
+    public function removeProcessFromRisk(
+            int $id,
+            int $processId,
+            RiesgoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeProcessFromRisk($id, $processId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
+
+    /**
+     * @Route("/api/riesgo/{id}/remove-control/{controlId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a control from a riesgo",
+     *     tags={"Riesgos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Process or Risk not found"
+     *     )
+     * )
+     */
+    public function removeControlFromRisk(
+            int $id,
+            int $controlId,
+            RiesgoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeControlFromRisk($id, $controlId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
+
 }
