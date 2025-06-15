@@ -3,6 +3,7 @@
 namespace App\Controller\Riesgo;
 
 use App\Entity\Riesgo\Proyecto;
+Use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\Riesgo\ProyectoRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -152,4 +153,29 @@ class ProyectoController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
+    /**
+     * @Route("/api/proyecto/{id}/remove-user/{userId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a user from a proyecto",
+     *     tags={"Proyectos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or Proyecto not found"
+     *     )
+     * )
+     */
+    public function removeUserFromProyecto(
+            int $id,
+            int $userId,
+            ProyectoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeUserFromProyecto($id, $userId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
 }

@@ -152,4 +152,33 @@ class RiesgoController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
+    /**
+    *  Get All Riesgo para asociar a otros entidades.
+    * @Route("/api/riesgoassociate", methods={"GET"})
+    * @OA\Post(
+        * summary="Riesgos",
+        * description="Lista todo",
+        * operationId="AllRiesgo",
+        * tags={"Riesgos"},
+        * @OA\RequestBody(
+        *    required=true,
+        *    description="Consulta todos los riesgos sin entidades relacionadadas",
+        * ),
+        * @OA\Response(
+        *    response=422,
+        *    description="Wrong credentials response",
+        *    @OA\JsonContent(
+        *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+        *        )
+        *     )
+        * )
+        * @OA\Tag(name="Riesgos")
+        * @Security(name="Bearer")
+    */   
+    public function findAllAssociate(Request $request,RiesgoRepository $repository): JsonResponse
+    {
+        $data = $repository->getAllForAssociate();
+        return new JsonResponse($data, 200);
+    }
+
 }

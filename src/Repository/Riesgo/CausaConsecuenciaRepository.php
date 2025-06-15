@@ -3,6 +3,7 @@
 namespace App\Repository\Riesgo;
 
 use App\Entity\Riesgo\CausaConsecuencia;
+use App\Entity\Riesgo\Riesgo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -76,14 +77,14 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
         $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
         $entity->setUpdateBy($currentUser->getUserName());
         $entity->setUpdateAt(new \DateTime());
+
+
         foreach ($data["risks"] as $key => $value) {
             $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
             if ($risk) {
                 $entity->addRiesgo($risk);
             }
         } 
-
- 
 
         $errors = $validator->validate($entity);
         if($errors->count() > 0){
@@ -96,7 +97,6 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
             $entityManager->flush();
             return new JsonResponse(['msg'=>'Registro Actualizado: '.$entity->getId()],200);
         }
-
     }
 
     public function getAll(): array
@@ -115,8 +115,8 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impacto'     => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
-                    'frecuencia'  => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
+                    'impact'      => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
+                    'frequency'   => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                 ];
             }
             $result[] = [
@@ -149,8 +149,8 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impacto'     => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
-                    'frecuencia'  => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
+                    'impact'      => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
+                    'frequency'   => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                     'description' => $risk->getDescription(),
                 ];
             }
@@ -162,5 +162,27 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
             ];
         }
         return $result;
+    }
+
+    
+    /**
+     * Delete.
+     */
+    public function removeRiesgoFromCausa($causaId, $riesgoId): JsonResponse
+    {
+        $entityManager = $this->getEntityManager();
+
+        $causa = $entityManager->getRepository(CausaConsecuencia::class)->find($causaId);
+        $riesgo = $entityManager->getRepository(Riesgo::class)->find($riesgoId);
+
+        if (!$causa || !$riesgo) {
+            return new JsonResponse(['msg' => 'No se encontró alguna de las entidades.'], 404);
+        }
+
+        $causa->removeRiesgo($riesgo);
+        $entityManager->persist($causa); // opcional pero seguro
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }

@@ -1219,8 +1219,7 @@ class UserRepository extends ServiceEntityRepository
         foreach ($users as $user) {
             $result[] = [
                 'id'    => $user->getId(),
-                'name'  =>  $user->getPrimerNombre(), 
-                'lastName'  =>    $user->getPrimerApellido(),
+                'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(),
                 'dependence'  => $user->getIdDependencia() == null ? 0 : $user->getIdDependencia()->getDescripcion(),
                 'position' => $user->getIdCargo() == null ? 0 : $user->getIdCargo()->getDescripcion()
             ];

@@ -157,4 +157,44 @@ class ProyectoRepository extends ServiceEntityRepository
         }
         return $result;
     }
+
+    /**
+     * Delete.
+     */
+    public function removeUserFromProyecto($proyectoId, $userId): array
+    {
+        $em = $this->getEntityManager();
+
+        // Buscar las entidades por su ID
+        $proyecto = $em->getRepository(Proyecto::class)->find($proyectoId);
+        $user = $em->getRepository(User::class)->find($userId);
+
+        // Validar existencia
+        if (!$proyecto || !$user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Proyecto o usuario no encontrado.'
+            ], 404);
+        }
+
+        // Validar que el usuario esté vinculado al proyecto
+        if (!$proyecto->getUsers()->contains($user)) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'El usuario no está asignado a este proyecto.'
+            ], 404);
+        }
+
+        // Remover la relación
+        $proyecto->removeUser($user);
+        $user->removeProyecto($proyecto);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+
+    }
 }

@@ -258,6 +258,28 @@ class RiesgoRepository extends ServiceEntityRepository
         }
         return $result;
     }
+
+    /**
+     * Para llenar lista donde se asocian riesgos. Por ejemplo en el módulo de procesos se asocian riesgos
+     */
+    public function getAllForAssociate(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $riesgos = $this->createQueryBuilder('p')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($riesgos as $riesgo) {
+            $result[] = [
+                'id'          => $riesgo->getId(),
+                'name'        => $riesgo->getName(),
+                'impact'        => $riesgo->getImpact()  == null ? '' : $riesgo->getImpact()->getDescripcion(),
+                'frequency'        => $riesgo->getFrequency() == null ? '' : $riesgo->getFrequency()->getDescripcion()
+            ];
+        }
+        return $result;
+    }
 }
 
   

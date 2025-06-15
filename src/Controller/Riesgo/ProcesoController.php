@@ -68,7 +68,7 @@ class ProcesoController extends AbstractController
         * summary="Put proceso",
         * description="Update proceso",
         * operationId="updateproceso",
-        * tags={"procesos"},
+        * tags={"Procesos"},
         * @OA\RequestBody(
         *    required=true,
         *    description="Data proceso",
