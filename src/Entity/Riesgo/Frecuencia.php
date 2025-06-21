@@ -65,11 +65,17 @@ class Frecuencia
      */
     private $riesgos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ImpactoFrecuencia::class, mappedBy="frecuencia", orphanRemoval=true)
+     */
+    private $impactoFrecuencias;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
         $this->updateBy = "system";
         $this->riesgos = new ArrayCollection();
+        $this->impactoFrecuencias = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -197,6 +203,36 @@ class Frecuencia
             // set the owning side to null (unless already changed)
             if ($riesgo->getFrequency() === $this) {
                 $riesgo->setFrequency(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ImpactoFrecuencia[]
+     */
+    public function getImpactoFrecuencias(): Collection
+    {
+        return $this->impactoFrecuencias;
+    }
+
+    public function addImpactoFrecuencia(ImpactoFrecuencia $impactoFrecuencia): self
+    {
+        if (!$this->impactoFrecuencias->contains($impactoFrecuencia)) {
+            $this->impactoFrecuencias[] = $impactoFrecuencia;
+            $impactoFrecuencia->setFrecuencia($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImpactoFrecuencia(ImpactoFrecuencia $impactoFrecuencia): self
+    {
+        if ($this->impactoFrecuencias->removeElement($impactoFrecuencia)) {
+            // set the owning side to null (unless already changed)
+            if ($impactoFrecuencia->getFrecuencia() === $this) {
+                $impactoFrecuencia->setFrecuencia(null);
             }
         }
 

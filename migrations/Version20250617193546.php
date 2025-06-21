@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250611203105 extends AbstractMigration
+final class Version20250617193546 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,7 +20,9 @@ final class Version20250611203105 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE riesgo ADD impact_id INT NOT NULL, ADD frequency_id INT NOT NULL, DROP impacto, DROP frecuencia');
+        $this->addSql('CREATE TABLE impacto_frecuencia (id INT AUTO_INCREMENT NOT NULL, impacto_id INT NOT NULL, frecuencia_id INT NOT NULL, color VARCHAR(100) NOT NULL, update_at DATETIME DEFAULT NULL, update_by VARCHAR(255) DEFAULT NULL, INDEX IDX_337CD7609AB23772 (impacto_id), INDEX IDX_337CD7608B2E2212 (frecuencia_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE impacto_frecuencia ADD CONSTRAINT FK_337CD7609AB23772 FOREIGN KEY (impacto_id) REFERENCES impacto (id)');
+        $this->addSql('ALTER TABLE impacto_frecuencia ADD CONSTRAINT FK_337CD7608B2E2212 FOREIGN KEY (frecuencia_id) REFERENCES frecuencia (id)');
         $this->addSql('ALTER TABLE riesgo ADD CONSTRAINT FK_CEF448C4D128BC9B FOREIGN KEY (impact_id) REFERENCES impacto (id)');
         $this->addSql('ALTER TABLE riesgo ADD CONSTRAINT FK_CEF448C494879022 FOREIGN KEY (frequency_id) REFERENCES frecuencia (id)');
         $this->addSql('CREATE INDEX IDX_CEF448C4D128BC9B ON riesgo (impact_id)');
@@ -30,10 +32,10 @@ final class Version20250611203105 extends AbstractMigration
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('DROP TABLE impacto_frecuencia');
         $this->addSql('ALTER TABLE riesgo DROP FOREIGN KEY FK_CEF448C4D128BC9B');
         $this->addSql('ALTER TABLE riesgo DROP FOREIGN KEY FK_CEF448C494879022');
         $this->addSql('DROP INDEX IDX_CEF448C4D128BC9B ON riesgo');
         $this->addSql('DROP INDEX IDX_CEF448C494879022 ON riesgo');
-        $this->addSql('ALTER TABLE riesgo ADD impacto INT NOT NULL, ADD frecuencia INT NOT NULL, DROP impact_id, DROP frequency_id');
     }
 }

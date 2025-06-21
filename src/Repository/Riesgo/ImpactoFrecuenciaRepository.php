@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Repository\Riesgo;
+
+use App\Entity\Riesgo\ImpactoFrecuencia;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @method ImpactoFrecuencia|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ImpactoFrecuencia|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ImpactoFrecuencia[]    findAll()
+ * @method ImpactoFrecuencia[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
+class ImpactoFrecuenciaRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ImpactoFrecuencia::class);
+    }
+
+    public function getAll(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $impactoFrecuencia = $this->createQueryBuilder('p')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($impactoFrecuencia as $mapa) {
+            $result[] = [
+                'id'         => $mapa->getId(),
+                'impacto'    => $mapa->getImpacto()->GetId(),
+                'frecuencia' => $mapa->getFrecuencia()->GetId(),
+                'color'      =>  $mapa->getColor()
+            ];
+        }
+        return $result;
+    }
+}
