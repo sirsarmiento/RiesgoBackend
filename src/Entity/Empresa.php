@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Riesgo\CausaConsecuencia;
 use App\Entity\Riesgo\Control;
+use App\Entity\Riesgo\ParametrosControl;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Proyecto;
 use App\Entity\Riesgo\Riesgo;
@@ -86,6 +87,11 @@ class Empresa
      */
     private $controls;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ParametrosControl::class, mappedBy="empresa")
+     */
+    private $parametrosControls;
+
 
     public function __construct()
     {
@@ -94,6 +100,7 @@ class Empresa
         $this->Riesgo = new ArrayCollection();
         $this->causaConsecuencias = new ArrayCollection();
         $this->controls = new ArrayCollection();
+        $this->parametrosControls = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -329,6 +336,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($control->getEmpresa() === $this) {
                 $control->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ParametrosControl[]
+     */
+    public function getParametrosControls(): Collection
+    {
+        return $this->parametrosControls;
+    }
+
+    public function addParametrosControl(ParametrosControl $parametrosControl): self
+    {
+        if (!$this->parametrosControls->contains($parametrosControl)) {
+            $this->parametrosControls[] = $parametrosControl;
+            $parametrosControl->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParametrosControl(ParametrosControl $parametrosControl): self
+    {
+        if ($this->parametrosControls->removeElement($parametrosControl)) {
+            // set the owning side to null (unless already changed)
+            if ($parametrosControl->getEmpresa() === $this) {
+                $parametrosControl->setEmpresa(null);
             }
         }
 
