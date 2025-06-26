@@ -118,6 +118,36 @@ class Control
      */
     private Collection $riesgos;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $solidityDesign;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $percentageDesign;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $solidityExecution;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $percentageExecution;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $solidityResult;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $percentageResult;
+
 
     public function __construct()
     {
@@ -374,6 +404,78 @@ class Control
     public function setIsEvidenceEffective(int $isEvidenceEffective): self
     {
         $this->isEvidenceEffective = $isEvidenceEffective;
+
+        return $this;
+    }
+
+    public function getSolidityDesign(): ?string
+    {
+        return $this->solidityDesign;
+    }
+
+    public function setSolidityDesign(?string $solidityDesign): self
+    {
+        $this->solidityDesign = $solidityDesign;
+
+        return $this;
+    }
+
+    public function getPercentageDesign(): ?string
+    {
+        return $this->percentageDesign;
+    }
+
+    public function setPercentageDesign(?string $percentageDesign): self
+    {
+        $this->percentageDesign = $percentageDesign;
+
+        return $this;
+    }
+
+    public function getSolidityExecution(): ?string
+    {
+        return $this->solidityExecution;
+    }
+
+    public function setSolidityExecution(?string $solidityExecution): self
+    {
+        $this->solidityExecution = $solidityExecution;
+
+        return $this;
+    }
+
+    public function getPercentageExecution(): ?string
+    {
+        return $this->percentageExecution;
+    }
+
+    public function setPercentageExecution(?string $percentageExecution): self
+    {
+        $this->percentageExecution = $percentageExecution;
+
+        return $this;
+    }
+
+    public function getSolidityResult(): ?string
+    {
+        return $this->solidityResult;
+    }
+
+    public function setSolidityResult(?string $solidityResult): self
+    {
+        $this->solidityResult = $solidityResult;
+
+        return $this;
+    }
+
+    public function getPercentageResult(): ?string
+    {
+        return $this->percentageResult;
+    }
+
+    public function setPercentageResult(?string $percentageResult): self
+    {
+        $this->percentageResult = $percentageResult;
 
         return $this;
     }

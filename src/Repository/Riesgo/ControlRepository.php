@@ -155,6 +155,12 @@ class ControlRepository extends ServiceEntityRepository
                 'isEvidenceEffective' => $control->getIsEvidenceEffective(),
                 'correctTime' => $control->getCorrectTime(),
                 'description' => $control->getDescription(),
+                'solidityDesign' => $control->getSolidityDesign(),
+                'percentageDesign' => $control->getPercentageDesign(),
+                'solidityExecution' => $control->getSolidityExecution(),
+                'percentageExecution' => $control->getPercentageExecution(),
+                'solidityResult' => $control->getSolidityResult(),
+                'percentageResult' => $control->getPercentageResult(),
                 'responsibles' => $responsibles,
                 'risks' => $risks,
             ];

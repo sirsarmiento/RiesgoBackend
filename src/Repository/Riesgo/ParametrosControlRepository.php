@@ -98,7 +98,7 @@ class ParametrosControlRepository extends ServiceEntityRepository
                 'parama'       => $ParametrosControl->getParama(), //Peso o Desde
                 'paramb' => $ParametrosControl->getParamb(), //Porcentaje o Hasta
                 'paramc' => $ParametrosControl->getParamc(), // Color
-                'modulo' => $ParametrosControl->getModule(), // Asignación de pesos, diseño, ejecución, Solidez
+                'module' => $ParametrosControl->getModule(), // Asignación de pesos, diseño, ejecución, Solidez
             ];
         }
         return $result;
