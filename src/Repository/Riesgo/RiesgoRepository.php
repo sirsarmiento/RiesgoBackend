@@ -287,10 +287,12 @@ class RiesgoRepository extends ServiceEntityRepository
             $result[] = [
                 'id'          => $riesgo->getId(),
                 'name'        => $riesgo->getName(),
-                'impactoId'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
-                'impact'        => $riesgo->getImpact()  == null ? '' : $riesgo->getImpact()->getDescripcion(),
-                'frecuenciaId'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
-                'frequency'        => $riesgo->getFrequency() == null ? '' : $riesgo->getFrequency()->getDescripcion(),
+                'impact'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
+                'impactName'        => $riesgo->getImpact()  == null ? '' : $riesgo->getImpact()->getDescripcion(),
+                'impactWeight'        => $riesgo->getImpact()  == null ? '' : $riesgo->getImpact()->getPeso(),
+                'frecuency'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
+                'frequencyName'        => $riesgo->getFrequency() == null ? '' : $riesgo->getFrequency()->getDescripcion(),
+                'frequencyWeight'        => $riesgo->getFrequency() == null ? '' : $riesgo->getFrequency()->getPeso(),
                 'responsibles'=> $responsibles
             ];
         }

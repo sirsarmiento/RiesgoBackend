@@ -168,7 +168,7 @@ class UserRepository extends ServiceEntityRepository
             $userDto->segundoNombre=$valor->getSegundoNombre();
             $userDto->primerApellido= $valor->getPrimerApellido();
             $userDto->segundoApellido= $valor->getSegundoApellido();
-            $userDto->fechaNacimiento=$userDto->fechaNacimiento!=null?$valor->getFechaNacimiento()->format("Y-m-d"):null;
+            $userDto->fechaNacimiento=$valor->getFechaNacimiento()->format("Y-m-d");
             $userDto->email=$valor->getEmail();
             $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
             $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];

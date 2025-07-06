@@ -217,8 +217,10 @@ class EventoRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impact'      => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getDescripcion(),
-                    'frequency'   => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getDescripcion(),
+                    'impact'      => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
+                    'impactName'  => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
+                    'frecuency'   => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
+                    'frequencyName'  => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                 ];
             }
             $result[] = [
@@ -287,8 +289,10 @@ class EventoRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impact'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getDescripcion(),
-                    'frequency'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getDescripcion(),
+                    'impact'      => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
+                    'impactName'  => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
+                    'frecuency'   => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
+                    'frequencyName'  => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                 ];
             }
             foreach ($evento->getControles() as $control) {

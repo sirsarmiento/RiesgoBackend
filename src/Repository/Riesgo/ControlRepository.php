@@ -138,8 +138,10 @@ class ControlRepository extends ServiceEntityRepository
                 $risks[] = [
                     'id'          => $risk->getId(),
                     'name'        => $risk->getName(),
-                    'impact'      => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
-                    'frequency'   => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
+                    'impact'        => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getId(),
+                    'impactName'        => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
+                    'frecuency'        => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
+                    'frequencyName'        => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                 ];
             }
             $result[] = [
