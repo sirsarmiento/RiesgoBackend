@@ -44,6 +44,16 @@ class ImpactoFrecuencia
      */
     private $updateBy;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $inherente;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $colorInherente;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +115,30 @@ class ImpactoFrecuencia
     public function setUpdateBy(?string $updateBy): self
     {
         $this->updateBy = $updateBy;
+
+        return $this;
+    }
+
+    public function getInherente(): ?string
+    {
+        return $this->inherente;
+    }
+
+    public function setInherente(?string $inherente): self
+    {
+        $this->inherente = $inherente;
+
+        return $this;
+    }
+
+    public function getColorInherente(): ?string
+    {
+        return $this->colorInherente;
+    }
+
+    public function setColorInherente(?string $colorInherente): self
+    {
+        $this->colorInherente = $colorInherente;
 
         return $this;
     }

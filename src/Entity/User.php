@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Empresa;
+use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\ProyectoResponsables;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -213,6 +214,11 @@ class User implements UserInterface
      */
     private Collection $controls;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="user")
+     */
+    private $eventos;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -225,6 +231,7 @@ class User implements UserInterface
         $this->procesos = new ArrayCollection();
         $this->riesgos = new ArrayCollection();
         $this->controls = new ArrayCollection();
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -779,6 +786,33 @@ class User implements UserInterface
     public function removeControl(Control $control): self
     {
         $this->controls->removeElement($control);
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            $evento->removeUser($this);
+        }
+
         return $this;
     }
 

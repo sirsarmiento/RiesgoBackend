@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Riesgo\CausaConsecuencia;
 use App\Entity\Riesgo\Control;
+use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\ParametrosControl;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Proyecto;
@@ -92,6 +93,11 @@ class Empresa
      */
     private $parametrosControls;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Evento::class, mappedBy="empresa")
+     */
+    private $eventos;
+
 
     public function __construct()
     {
@@ -101,6 +107,7 @@ class Empresa
         $this->causaConsecuencias = new ArrayCollection();
         $this->controls = new ArrayCollection();
         $this->parametrosControls = new ArrayCollection();
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -366,6 +373,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($parametrosControl->getEmpresa() === $this) {
                 $parametrosControl->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            // set the owning side to null (unless already changed)
+            if ($evento->getEmpresa() === $this) {
+                $evento->setEmpresa(null);
             }
         }
 

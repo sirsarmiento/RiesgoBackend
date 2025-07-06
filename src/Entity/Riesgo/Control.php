@@ -148,6 +148,11 @@ class Control
      */
     private $percentageResult;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="controls")
+     */
+    private $eventos;
+
 
     public function __construct()
     {
@@ -155,6 +160,7 @@ class Control
         $this->riesgos = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -476,6 +482,33 @@ class Control
     public function setPercentageResult(?string $percentageResult): self
     {
         $this->percentageResult = $percentageResult;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->addControl($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            $evento->removeControl($this);
+        }
 
         return $this;
     }

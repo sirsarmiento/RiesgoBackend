@@ -105,6 +105,7 @@ class CausaConsecuenciaRepository extends ServiceEntityRepository
         $causes = $this->createQueryBuilder('p')
             ->leftJoin('p.riesgos', 'u')
             ->addSelect('u')
+            ->addOrderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
 

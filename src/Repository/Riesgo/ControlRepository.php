@@ -118,6 +118,7 @@ class ControlRepository extends ServiceEntityRepository
         $controls = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
+            ->addOrderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
 

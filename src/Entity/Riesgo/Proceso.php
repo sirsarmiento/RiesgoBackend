@@ -97,6 +97,11 @@ class Proceso
      */
     private Collection $riesgos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="procesos")
+     */
+    private $eventos;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -107,6 +112,7 @@ class Proceso
         $this->updateBy = null; // Initially no updates
         $this->category = 0; // Default category
         $this->type = 0; // Default type
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -309,6 +315,33 @@ class Proceso
     public function removeRiesgo(Riesgo $riesgo): self
     {
         $this->riesgos->removeElement($riesgo);
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->addProceso($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            $evento->removeProceso($this);
+        }
+
         return $this;
     }
 }

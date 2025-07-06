@@ -71,10 +71,16 @@ class CausaConsecuencia
      */
     private Collection $riesgos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="CausaConsecuencias")
+     */
+    private $eventos;
+
     public function __construct()
     {
         $this->riesgos = new ArrayCollection();
         $this->createAt = new \DateTime();
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -206,6 +212,33 @@ class CausaConsecuencia
     public function removeRiesgo(Riesgo $riesgo): self
     {
         $this->riesgos->removeElement($riesgo);
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->addCausaConsecuencia($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            $evento->removeCausaConsecuencia($this);
+        }
+
         return $this;
     }
 

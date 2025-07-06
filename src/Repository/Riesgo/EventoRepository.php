@@ -2,6 +2,7 @@
 
 namespace App\Repository\Riesgo;
 
+use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\Riesgo;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Control;
@@ -14,26 +15,28 @@ use App\Entity\Empresa;
 Use App\Entity\User;
 
 /**
- * @method Riesgo|null find($id, $lockMode = null, $lockVersion = null)
- * @method Riesgo|null findOneBy(array $criteria, array $orderBy = null)
- * @method Riesgo[]    findAll()
- * @method Riesgo[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Evento|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Evento|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Evento[]    findAll()
+ * @method Evento[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class RiesgoRepository extends ServiceEntityRepository
+class EventoRepository extends ServiceEntityRepository
 {
+    private $security;
+
     public function __construct(ManagerRegistry $registry, Security $security)
     {
         $this->security = $security;
-        parent::__construct($registry, Riesgo::class);
+        parent::__construct($registry, Evento::class);
     }
 
     /**
-     * Create Riesgo.
+     * Create Evento.
      */
     public function post($data,$validator,$helper): JsonResponse  {
        
         $entityManager = $this->getEntityManager();
-        $entity=$helper->setParametersToEntity(new Riesgo(),$data);
+        $entity=$helper->setParametersToEntity(new Evento(),$data);
 
         $errors = $validator->validate($entity);
         if($errors->count() > 0){
@@ -55,7 +58,7 @@ class RiesgoRepository extends ServiceEntityRepository
                 }
             }
 
-            // Itera sobre las Causas y asocia cada uno con la entidad Riesgo
+            // Itera sobre las Causas y asocia cada uno con la entidad Evento
             foreach ($data["causes"] as $key => $value) {
                 $cause = $entityManager->getRepository(\App\Entity\Riesgo\CausaConsecuencia::class)->find($value['id']);
                 if ($cause) {
@@ -63,7 +66,7 @@ class RiesgoRepository extends ServiceEntityRepository
                 }
             }
 
-            // Itera sobre los procesos y asocia cada uno con la entidad Riesgo
+            // Itera sobre los procesos y asocia cada uno con la entidad Evento
             foreach ($data["processes"] as $key => $value) {
                 $process = $entityManager->getRepository(\App\Entity\Riesgo\Proceso::class)->find($value['id']);
                 if ($process) {
@@ -71,10 +74,19 @@ class RiesgoRepository extends ServiceEntityRepository
                 }
             }
 
+            // Itera sobre los controles y asocia cada uno con la entidad Evento
             foreach ($data["controls"] as $key => $value) {
                 $control = $entityManager->getRepository(\App\Entity\Riesgo\Control::class)->find($value['id']);
                 if ($control) {
                     $entity->addControl($control);
+                }
+            }
+
+            // Itera sobre los eventos y asocia cada uno con la entidad Evento
+            foreach ($data["risks"] as $key => $value) {
+                $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
+                if ($risk) {
+                    $entity->addRiesgo($risk);
                 }
             }
 
@@ -86,12 +98,12 @@ class RiesgoRepository extends ServiceEntityRepository
     }
 
     /**
-     * Update Riesgo.
+     * Update Evento.
      */
     public function put($data,$id,$validator,$helper): JsonResponse  
     {
         $entityManager = $this->getEntityManager();
-        $entity =$entityManager->getRepository(Riesgo::class)->find($id);
+        $entity =$entityManager->getRepository(Evento::class)->find($id);
         if (!$entity) {
             return new JsonResponse(['msg'=>'No existen Registros con el id: '.$id],404);  
         }
@@ -107,7 +119,7 @@ class RiesgoRepository extends ServiceEntityRepository
             }
         }
 
-        // Itera sobre las Causas y asocia cada uno con la entidad Riesgo
+        // Itera sobre las Causas y asocia cada uno con la entidad Evento
         foreach ($data["causes"] as $key => $value) {
             $cause = $entityManager->getRepository(\App\Entity\Riesgo\CausaConsecuencia::class)->find($value['id']);
             if ($cause) {
@@ -115,7 +127,7 @@ class RiesgoRepository extends ServiceEntityRepository
             }
         }
 
-        // Itera sobre los procesos y asocia cada uno con la entidad Riesgo
+        // Itera sobre los procesos y asocia cada uno con la entidad Evento
         foreach ($data["processes"] as $key => $value) {
             $process = $entityManager->getRepository(\App\Entity\Riesgo\Proceso::class)->find($value['id']);
             if ($process) {
@@ -123,10 +135,19 @@ class RiesgoRepository extends ServiceEntityRepository
             }
         }
 
+        // Itera sobre los controles y asocia cada uno con la entidad Evento
         foreach ($data["controls"] as $key => $value) {
             $control = $entityManager->getRepository(\App\Entity\Riesgo\Control::class)->find($value['id']);
             if ($control) {
                 $entity->addControl($control);
+            }
+        }
+
+        // Itera sobre los eventos y asocia cada uno con la entidad Evento
+        foreach ($data["risks"] as $key => $value) {
+            $risk = $entityManager->getRepository(\App\Entity\Riesgo\Riesgo::class)->find($value['id']);
+            if ($risk) {
+                $entity->addRiesgo($risk);
             }
         }
 
@@ -148,7 +169,7 @@ class RiesgoRepository extends ServiceEntityRepository
     {
   
         $entityManager = $this->getEntityManager();
-        $riesgos = $this->createQueryBuilder('p')
+        $eventos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
             ->addOrderBy('p.name', 'ASC')
@@ -156,12 +177,13 @@ class RiesgoRepository extends ServiceEntityRepository
             ->getResult();
 
         $result = [];
-        foreach ($riesgos as $riesgo) {
+        foreach ($eventos as $evento) {
             $responsibles = [];
             $processes = [];
             $causes = [];
             $controls = [];
-            foreach ($riesgo->getUsers() as $user) {
+            $risks = [];
+            foreach ($evento->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
                     'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
@@ -169,21 +191,21 @@ class RiesgoRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
-            foreach ($riesgo->getCausaConsecuencias() as $cause) {
+            foreach ($evento->getCausaConsecuencias() as $cause) {
                 $causes[] = [
                     'id'          => $cause->getId(),
                     'name'        => $cause->getName(),
                     'type'       => $cause->getType(),
                 ];
             }
-            foreach ($riesgo->getProcesos() as $process) {
+            foreach ($evento->getProcesos() as $process) {
                 $processes[] = [
                     'id'          => $process->getId(),
                     'name'        => $process->getName(),
                     'type'        => $process->getType(),
                 ];
             }
-            foreach ($riesgo->getControls() as $control) {
+            foreach ($evento->getControls() as $control) {
                 $controls[] = [
                     'id'          => $control->getId(),
                     'name'        => $control->getName(),
@@ -191,19 +213,31 @@ class RiesgoRepository extends ServiceEntityRepository
                     'executionType' => $control->getExecutionType(),
                 ];
             }
+            foreach ($evento->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'impact'      => $risk->getImpact()  == null ? 0 : $risk->getImpact()->getDescripcion(),
+                    'frequency'   => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getDescripcion(),
+                ];
+            }
             $result[] = [
-                'id'          => $riesgo->getId(),
-                'name'        => $riesgo->getName(),
-                'impact'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
-                'impactName'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getDescripcion(),
-                'frequency'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
-                'frequencyName'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getDescripcion(),
-                'description' => $riesgo->getDescription(),
-                'affect'      => $riesgo->getAffect(),
+                'id'          => $evento->getId(),
+                'name'        => $evento->getName(),
+                'description' => $evento->getDescription(),
+                'whereOcurred' => $evento->getWhereOcurred(),
+                'startDate' => $evento->getStartDate()->format('Y-m-d'),
+                'startTime' => $evento->getStartTime(),
+                'discoveryDate' => $evento->getDiscoveryDate()->format('Y-m-d'),
+                'discoveryTime' => $evento->getDiscoveryTime(),
+                'state' => $evento->getState(),
+                'criticality' => $evento->getCriticality(),
+                'generateLoss' => $evento->getGenerateLoss(),
                 'responsibles' => $responsibles,
                 'processes' => $processes,
                 'causes' => $causes,
                 'controls' => $controls,
+                'risks' => $risks,
             ];
         }
         return $result;
@@ -212,7 +246,7 @@ class RiesgoRepository extends ServiceEntityRepository
     public function getById($id): array
     {
         $entityManager = $this->getEntityManager();
-        $riesgos = $this->createQueryBuilder('p')
+        $eventos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
             ->where('p.id = :id')
@@ -221,11 +255,13 @@ class RiesgoRepository extends ServiceEntityRepository
             ->getResult();
 
         $result = [];
-        foreach ($riesgos as $riesgo) {
+        foreach ($eventos as $evento) {
             $responsibles = [];
             $processes = [];
             $causes = [];
-            foreach ($riesgo->getUsers() as $user) {
+            $risks = [];
+            $controls = [];
+            foreach ($evento->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
                     'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
@@ -233,86 +269,65 @@ class RiesgoRepository extends ServiceEntityRepository
                     'position'   => $user->getIdCargo()->getDescripcion(),   
                 ];
             }
-            foreach ($riesgo->getCausaConsecuencias() as $cause) {
+            foreach ($evento->getCausaConsecuencias() as $cause) {
                 $causes[] = [
                     'id'          => $cause->getId(),
                     'name'        => $cause->getName(),
                     'type' => $cause->getType(),
                 ];
             }
-            foreach ($riesgo->getProcesos() as $process) {
+            foreach ($evento->getProcesos() as $process) {
                 $processes[] = [
                     'id'          => $process->getId(),
                     'name'        => $process->getName(),
                     'type'        => $process->getType(),
                 ];
             }
-            $result[] = [
-                'id'          => $riesgo->getId(),
-                'name'        => $riesgo->getName(),
-                'description' => $riesgo->getDescription(),
-                'affect'      => $riesgo->getAffect(),
-                'impact'      => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
-                'frequency'   => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
-                'responsibles'=> $responsibles,
-                'processes' => $processes,
-                'causes' => $causes,
-            ];
-        }
-        return $result;
-    }
-
-    /**
-     * Para llenar lista donde se asocian riesgos. Por ejemplo en el módulo de procesos se asocian riesgos
-     */
-    public function getAllForAssociate(): array
-    {
-        $entityManager = $this->getEntityManager();
-        $riesgos = $this->createQueryBuilder('p')
-            ->addOrderBy('p.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-
-        $result = [];
-        foreach ($riesgos as $riesgo) {
-            $responsibles = [];
-            foreach ($riesgo->getUsers() as $user) {
-                $responsibles[] = [
-                    'id'     => $user->getId(),
-                    'fullName'   => $user->getPrimerNombre()." ".$user->getPrimerApellido(), // Asegúrate de tener este método en User
-                    'dependence' => $user->getIdDependencia()->getDescripcion(), 
-                    'position'   => $user->getIdCargo()->getDescripcion(),   
+            foreach ($evento->getRiesgos() as $risk) {
+                $risks[] = [
+                    'id'          => $risk->getId(),
+                    'name'        => $risk->getName(),
+                    'impact'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getDescripcion(),
+                    'frequency'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getDescripcion(),
                 ];
             }
-            $result[] = [
-                'id'          => $riesgo->getId(),
-                'name'        => $riesgo->getName(),
-                'impactoId'        => $riesgo->getImpact()  == null ? 0 : $riesgo->getImpact()->getId(),
-                'impact'        => $riesgo->getImpact()  == null ? '' : $riesgo->getImpact()->getDescripcion(),
-                'frecuenciaId'        => $riesgo->getFrequency() == null ? 0 : $riesgo->getFrequency()->getId(),
-                'frequency'        => $riesgo->getFrequency() == null ? '' : $riesgo->getFrequency()->getDescripcion(),
-                'responsibles'=> $responsibles
+            foreach ($evento->getControles() as $control) {
+                $controls[] = [
+                    'id'          => $control->getId(),
+                    'name'        => $control->getName(),
+                    'type'        => $control->getType(),
+                ];
+            }
+           $result[] = [
+                'id'          => $evento->getId(),
+                'name'        => $evento->getName(),
+                'description' => $evento->getDescription(),
+                'responsibles' => $responsibles,
+                'processes' => $processes,
+                'causes' => $causes,
+                'controls' => $controls,
+                'risks' => $risks,
             ];
         }
         return $result;
     }
 
     /**
-     * Delete user from riesgo.
+     * Delete user from evento.
      */
-    public function removeUserFromRisk($riskId, $userId): array
+    public function removeUserFromEvent($eventId, $userId): array
     {
         $em = $this->getEntityManager();
 
         // Buscar las entidades por su ID
-        $risk= $em->getRepository(Riesgo::class)->find($riskId);
+        $event = $em->getRepository(Evento::class)->find($eventId);
         $user = $em->getRepository(User::class)->find($userId);
 
         // Validar existencia
-        if (!$risk || !$user) {
+        if (!$event || !$user) {
             return [
                 'success' => false,
-                'message' => 'Riesgo o responsable no encontrado.',
+                'message' => 'Evento o responsable no encontrado.',
                 'code' => 404
             ];
         }
@@ -321,14 +336,14 @@ class RiesgoRepository extends ServiceEntityRepository
         if (!$risk->getUsers()->contains($user)) {
            return [
                 'success' => false,
-                'message' => 'El responsable no está asignado a este riesgo.',
+                'message' => 'El responsable no está asignado a este evento.',
                 'code' => 404
             ];
         }
 
         // Remover la relación
         $risk->removeUser($user);
-        $user->removeRiesgo($risk);
+        $user->removeEvento($risk);
 
         $em->flush();
 
@@ -339,37 +354,37 @@ class RiesgoRepository extends ServiceEntityRepository
     }
 
     /**
-     * Delete process from riesgo.
+     * Delete process from evento.
      */
-    public function removeProcessFromRisk($riskId, $processId): array
+    public function removeProcessFromEvent($eventId, $processId): array
     {
         $em = $this->getEntityManager();
 
         // Buscar las entidades por su ID
-        $risk= $em->getRepository(Riesgo::class)->find($riskId);
+        $event = $em->getRepository(Evento::class)->find($eventId);
         $process = $em->getRepository(Proceso::class)->find($processId);
 
         // Validar existencia
-        if (!$risk || !$process) {
+        if (!$event || !$process) {
             return [
                 'success' => false,
-                'message' => 'Riesgo o proceso no encontrado.',
+                'message' => 'Evento o proceso no encontrado.',
                 'code' => 404
             ];
         }
 
         // Validar que el usuario esté vinculado al proceso
-        if (!$risk->getProcesos()->contains($process)) {
+        if (!$event->getProcesos()->contains($process)) {
             return [
                 'success' => false,
-                'message' => 'El proceso no está asignado a este riesgo.',
+                'message' => 'El proceso no está asignado a este evento.',
                 'code' => 404
             ];
         }
 
         // Remover la relación
-        $risk->removeProceso($process);
-        $process->removeRiesgo($risk);
+        $event->removeProceso($process);
+        $process->removeEvento($event);
 
         $em->flush();
 
@@ -380,37 +395,36 @@ class RiesgoRepository extends ServiceEntityRepository
     }
 
     /**
-     * Delete control from riesgo.
+     * Delete control from evento.
      */
-    public function removeControlFromRisk($riskId, $controlId): array
+    public function removeControlFromEvent($eventId, $controlId): array
     {
         $em = $this->getEntityManager();
-   
-        // Buscar las entidades por su ID
-        $risk= $em->getRepository(Riesgo::class)->find($riskId);
-        $control = $em->getRepository(Control::class)->find($controlId);
+       // Buscar las entidades por su ID
+       $event = $em->getRepository(Evento::class)->find($eventId);
+       $control = $em->getRepository(Control::class)->find($controlId);
 
-        // Validar existencia
-        if (!$risk || !$control) {
-            return [
+       // Validar existencia
+       if (!$event || !$control) {
+           return [
                 'success' => false,
-                'message' => 'Riesgo o control no encontrado.',
+                'message' => 'Evento o control no encontrado.',
                 'code' => 404
             ];
         }
 
         // Validar que el usuario esté vinculado al proceso
-        if (!$risk->getControls()->contains($control)) {
+        if (!$event->getControls()->contains($control)) {
             return [
                 'success' => false,
-                'message' => 'El control no está asignado a este riesgo.',
+                'message' => 'El control no está asignado a este evento.',
                 'code' => 404
             ];
         }
 
         // Remover la relación
-        $risk->removeControl($control);
-        $control->removeRiesgo($risk);
+        $event->removeControl($control);
+        $control->removeEvento($event);
 
         $em->flush();
 
@@ -420,5 +434,3 @@ class RiesgoRepository extends ServiceEntityRepository
         ];
     }
 }
-
-  

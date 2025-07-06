@@ -102,6 +102,7 @@ class ProyectoRepository extends ServiceEntityRepository
         $proyectos = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->addSelect('u')
+            ->addOrderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
 

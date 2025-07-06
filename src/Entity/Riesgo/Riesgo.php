@@ -99,6 +99,11 @@ class Riesgo
      */
     private $frequency;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="Riesgos")
+     */
+    private $eventos;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -107,6 +112,7 @@ class Riesgo
         $this->controls = new ArrayCollection();
         $this->createAt = new \DateTime();
         $this->createBy = 'System'; // Default value, can be changed later
+        $this->eventos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -319,6 +325,33 @@ class Riesgo
         if ($this->controls->removeElement($control)) {
             $control->removeRiesgo($this);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evento[]
+     */
+    public function getEventos(): Collection
+    {
+        return $this->eventos;
+    }
+
+    public function addEvento(Evento $evento): self
+    {
+        if (!$this->eventos->contains($evento)) {
+            $this->eventos[] = $evento;
+            $evento->addRiesgo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvento(Evento $evento): self
+    {
+        if ($this->eventos->removeElement($evento)) {
+            $evento->removeRiesgo($this);
+        }
+
         return $this;
     }
 }

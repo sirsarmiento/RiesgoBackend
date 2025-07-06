@@ -117,6 +117,7 @@ class ProcesoRepository extends ServiceEntityRepository
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.riesgos', 'r')
             ->addSelect('u', 'r')
+            ->addOrderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
 
