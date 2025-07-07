@@ -6,6 +6,7 @@ use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\Riesgo;
 use App\Entity\Riesgo\Proceso;
 use App\Entity\Riesgo\Control;
+use App\Entity\Riesgo\CausaConsecuencia;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -377,7 +378,7 @@ class EventoRepository extends ServiceEntityRepository
             ];
         }
 
-        // Validar que el usuario esté vinculado al proceso
+        // Validar que el proceso esté vinculado al proceso
         if (!$event->getProcesos()->contains($process)) {
             return [
                 'success' => false,
@@ -417,7 +418,7 @@ class EventoRepository extends ServiceEntityRepository
             ];
         }
 
-        // Validar que el usuario esté vinculado al proceso
+        // Validar que el control esté vinculado al proceso
         if (!$event->getControls()->contains($control)) {
             return [
                 'success' => false,
@@ -429,6 +430,86 @@ class EventoRepository extends ServiceEntityRepository
         // Remover la relación
         $event->removeControl($control);
         $control->removeEvento($event);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
+
+    /**
+     * Delete Risk from evento.
+     */
+    public function removeRiskFromEvent($eventId, $riskId): array
+    {
+        $em = $this->getEntityManager();
+       // Buscar las entidades por su ID
+       $event = $em->getRepository(Evento::class)->find($eventId);
+       $risk = $em->getRepository(Riesgo::class)->find($riskId);
+
+       // Validar existencia
+       if (!$event || !$risk) {
+           return [
+                'success' => false,
+                'message' => 'Evento o control no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el riesgo esté vinculado al proceso
+        if (!$event->getRiesgos()->contains($risk)) {
+            return [
+                'success' => false,
+                'message' => 'El riesgo no está asignado a este evento.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $event->removeRiesgo($risk);
+        $risk->removeEvento($event);
+
+        $em->flush();
+
+        return [
+            'success' => true,
+            'code' => 200
+        ];
+    }
+
+    /**
+     * Delete Cause o Concecuencia from evento.
+     */
+    public function removeCauseFromEvent($eventId, $causeId): array
+    {
+        $em = $this->getEntityManager();
+       // Buscar las entidades por su ID
+       $event = $em->getRepository(Evento::class)->find($eventId);
+       $cause = $em->getRepository(CausaConsecuencia::class)->find($causeId);
+
+       // Validar existencia
+       if (!$event || !$cause) {
+           return [
+                'success' => false,
+                'message' => 'Evento o control no encontrado.',
+                'code' => 404
+            ];
+        }
+
+        // Validar que el cause esté vinculado al proceso
+        if (!$event->getCausaConsecuencias()->contains($cause)) {
+            return [
+                'success' => false,
+                'message' => 'La causa o concecuencia no está asignado a este evento.',
+                'code' => 404
+            ];
+        }
+
+        // Remover la relación
+        $event->removeCausaConsecuencia($cause);
+        $cause->removeEvento($event);
 
         $em->flush();
 

@@ -255,4 +255,30 @@ class EventoController extends AbstractController
         $result = $repository->removeRiskFromEvent($id, $riskId);
         return new JsonResponse(['success' => $result['success']], $result['code']);
     }
+
+    /**
+     * @Route("/api/evento/{id}/remove-cause/{causeId}", methods={"DELETE"})
+     * @OA\Delete(
+     *     summary="Remove a cause from a evento",
+     *     tags={"Eventos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Cause removed successfully",
+     *         @OA\JsonContent(@OA\Property(property="success", type="boolean"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event or Cause not found"
+     *     )
+     * )
+     */
+    public function removeCauseFromEvent(
+            int $id,
+            int $causeId,
+            EventoRepository $repository
+        ): JsonResponse {
+
+        $result = $repository->removeCauseFromEvent($id, $causeId);
+        return new JsonResponse(['success' => $result['success']], $result['code']);
+    }
 }
