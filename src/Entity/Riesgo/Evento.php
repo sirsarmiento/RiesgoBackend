@@ -121,6 +121,11 @@ class Evento
      */
     private $CausaConsecuencias;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Plan::class, mappedBy="eventos")
+     */
+    private $plans;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -130,6 +135,7 @@ class Evento
         $this->CausaConsecuencias = new ArrayCollection();
         $this->createAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
+        $this->plans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -432,6 +438,33 @@ class Evento
     public function removeCausaConsecuencia(CausaConsecuencia $causaConsecuencia): self
     {
         $this->CausaConsecuencias->removeElement($causaConsecuencia);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Plan[]
+     */
+    public function getPlans(): Collection
+    {
+        return $this->plans;
+    }
+
+    public function addPlan(Plan $plan): self
+    {
+        if (!$this->plans->contains($plan)) {
+            $this->plans[] = $plan;
+            $plan->addEvento($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlan(Plan $plan): self
+    {
+        if ($this->plans->removeElement($plan)) {
+            $plan->removeEvento($this);
+        }
 
         return $this;
     }

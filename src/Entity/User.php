@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Entity\Empresa;
+use App\Entity\Riesgo\Actividad;
 use App\Entity\Riesgo\Evento;
+use App\Entity\Riesgo\Plan;
 use App\Entity\Riesgo\ProyectoResponsables;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -219,6 +221,16 @@ class User implements UserInterface
      */
     private $eventos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Plan::class, mappedBy="users")
+     */
+    private $plans;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Actividad::class, mappedBy="user")
+     */
+    private $actividads;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -232,6 +244,8 @@ class User implements UserInterface
         $this->riesgos = new ArrayCollection();
         $this->controls = new ArrayCollection();
         $this->eventos = new ArrayCollection();
+        $this->plans = new ArrayCollection();
+        $this->actividads = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -811,6 +825,63 @@ class User implements UserInterface
     {
         if ($this->eventos->removeElement($evento)) {
             $evento->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Plan[]
+     */
+    public function getPlans(): Collection
+    {
+        return $this->plans;
+    }
+
+    public function addPlan(Plan $plan): self
+    {
+        if (!$this->plans->contains($plan)) {
+            $this->plans[] = $plan;
+            $plan->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlan(Plan $plan): self
+    {
+        if ($this->plans->removeElement($plan)) {
+            $plan->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Actividad[]
+     */
+    public function getActividads(): Collection
+    {
+        return $this->actividads;
+    }
+
+    public function addActividad(Actividad $actividad): self
+    {
+        if (!$this->actividads->contains($actividad)) {
+            $this->actividads[] = $actividad;
+            $actividad->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActividad(Actividad $actividad): self
+    {
+        if ($this->actividads->removeElement($actividad)) {
+            // set the owning side to null (unless already changed)
+            if ($actividad->getUser() === $this) {
+                $actividad->setUser(null);
+            }
         }
 
         return $this;

@@ -153,6 +153,11 @@ class Control
      */
     private $eventos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Plan::class, mappedBy="controls")
+     */
+    private $plans;
+
 
     public function __construct()
     {
@@ -161,6 +166,7 @@ class Control
         $this->createdAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
         $this->eventos = new ArrayCollection();
+        $this->plans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -508,6 +514,33 @@ class Control
     {
         if ($this->eventos->removeElement($evento)) {
             $evento->removeControl($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Plan[]
+     */
+    public function getPlans(): Collection
+    {
+        return $this->plans;
+    }
+
+    public function addPlan(Plan $plan): self
+    {
+        if (!$this->plans->contains($plan)) {
+            $this->plans[] = $plan;
+            $plan->addControl($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlan(Plan $plan): self
+    {
+        if ($this->plans->removeElement($plan)) {
+            $plan->removeControl($this);
         }
 
         return $this;

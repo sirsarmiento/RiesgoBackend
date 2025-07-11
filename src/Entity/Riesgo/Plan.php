@@ -2,17 +2,17 @@
 
 namespace App\Entity\Riesgo;
 
-use App\Repository\Riesgo\ProcesoRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Empresa;
 use App\Entity\User;
-use App\Entity\Riesgo\Riesgo;
+use App\Repository\Riesgo\PlanRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @ORM\Entity(repositoryClass=ProcesoRepository::class)
+ * @ORM\Entity(repositoryClass=PlanRepository::class)
  */
-class Proceso
+class Plan
 {
     /**
      * @ORM\Id
@@ -27,39 +27,19 @@ class Proceso
     private $name;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $category;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $type;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $code;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $process;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Proyecto::class, inversedBy="procesos")
-     */
-    private $project;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $unit;
-
-    /**
-     * @ORM\Column(type="string", length=1000, nullable=true)
+     * @ORM\Column(type="string", length=2000, nullable=true)
      */
     private $description;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $startDate;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $endDate;
 
     /**
      * @ORM\Column(type="datetime")
@@ -82,43 +62,50 @@ class Proceso
     private $updateBy;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="procesos")
+     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="plans")
      */
     private $empresa;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="procesos")
-     * @ORM\JoinTable(name="proceso_user")
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="plans")
      */
-    private Collection $users;
+    private $users;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Riesgo::class, mappedBy="procesos")
+     * @ORM\ManyToMany(targetEntity=Proceso::class, inversedBy="plans")
      */
-    private Collection $riesgos;
+    private $procesos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Evento::class, mappedBy="procesos")
+     * @ORM\ManyToMany(targetEntity=Control::class, inversedBy="plans")
+     */
+    private $controls;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Riesgo::class, inversedBy="plans")
+     */
+    private $riesgos;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Evento::class, inversedBy="plans")
      */
     private $eventos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Plan::class, mappedBy="procesos")
+     * @ORM\OneToMany(targetEntity=Actividad::class, mappedBy="plan")
      */
-    private $plans;
+    private $actividads;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->procesos = new ArrayCollection();
+        $this->controls = new ArrayCollection();
         $this->riesgos = new ArrayCollection();
+        $this->eventos = new ArrayCollection();
         $this->createAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
-        $this->updateAt = null; // Initially no updates
-        $this->updateBy = null; // Initially no updates
-        $this->category = 0; // Default category
-        $this->type = 0; // Default type
-        $this->eventos = new ArrayCollection();
-        $this->plans = new ArrayCollection();
+        $this->actividads = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,78 +125,6 @@ class Proceso
         return $this;
     }
 
-    public function getCategory(): ?int
-    {
-        return $this->category;
-    }
-
-    public function setCategory(int $category): self
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    public function getType(): ?int
-    {
-        return $this->type;
-    }
-
-    public function setType(int $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getCode(): ?string
-    {
-        return $this->code;
-    }
-
-    public function setCode(?string $code): self
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
-    public function getProcess(): ?int
-    {
-        return $this->process;
-    }
-
-    public function setProcess(?int $process): self
-    {
-        $this->process = $process;
-
-        return $this;
-    }
-
-    public function getProject(): ?Proyecto
-    {
-        return $this->project;
-    }
-
-    public function setProject(?Proyecto $project): self
-    {
-        $this->project = $project;
-
-        return $this;
-    }
-
-    public function getUnit(): ?int
-    {
-        return $this->unit;
-    }
-
-    public function setUnit(?int $unit): self
-    {
-        $this->unit = $unit;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -218,6 +133,30 @@ class Proceso
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    public function setStartDate(\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
 
         return $this;
     }
@@ -282,6 +221,9 @@ class Proceso
         return $this;
     }
 
+    /**
+     * @return Collection|User[]
+     */
     public function getUsers(): Collection
     {
         return $this->users;
@@ -291,19 +233,69 @@ class Proceso
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->addProceso($this);
         }
+
         return $this;
     }
 
     public function removeUser(User $user): self
     {
-        if ($this->users->removeElement($user)) {
-            $user->removeProceso($this);
-        }
+        $this->users->removeElement($user);
+
         return $this;
     }
 
+    /**
+     * @return Collection|Proceso[]
+     */
+    public function getProcesos(): Collection
+    {
+        return $this->procesos;
+    }
+
+    public function addProceso(Proceso $proceso): self
+    {
+        if (!$this->procesos->contains($proceso)) {
+            $this->procesos[] = $proceso;
+        }
+
+        return $this;
+    }
+
+    public function removeProceso(Proceso $proceso): self
+    {
+        $this->procesos->removeElement($proceso);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Control[]
+     */
+    public function getControls(): Collection
+    {
+        return $this->controls;
+    }
+
+    public function addControl(Control $control): self
+    {
+        if (!$this->controls->contains($control)) {
+            $this->controls[] = $control;
+        }
+
+        return $this;
+    }
+
+    public function removeControl(Control $control): self
+    {
+        $this->controls->removeElement($control);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Riesgo[]
+     */
     public function getRiesgos(): Collection
     {
         return $this->riesgos;
@@ -313,14 +305,15 @@ class Proceso
     {
         if (!$this->riesgos->contains($riesgo)) {
             $this->riesgos[] = $riesgo;
-            $riesgo->addProceso($this);
         }
+
         return $this;
     }
 
     public function removeRiesgo(Riesgo $riesgo): self
     {
         $this->riesgos->removeElement($riesgo);
+
         return $this;
     }
 
@@ -336,7 +329,6 @@ class Proceso
     {
         if (!$this->eventos->contains($evento)) {
             $this->eventos[] = $evento;
-            $evento->addProceso($this);
         }
 
         return $this;
@@ -344,35 +336,36 @@ class Proceso
 
     public function removeEvento(Evento $evento): self
     {
-        if ($this->eventos->removeElement($evento)) {
-            $evento->removeProceso($this);
-        }
+        $this->eventos->removeElement($evento);
 
         return $this;
     }
 
     /**
-     * @return Collection|Plan[]
+     * @return Collection|Actividad[]
      */
-    public function getPlans(): Collection
+    public function getActividads(): Collection
     {
-        return $this->plans;
+        return $this->actividads;
     }
 
-    public function addPlan(Plan $plan): self
+    public function addActividad(Actividad $actividad): self
     {
-        if (!$this->plans->contains($plan)) {
-            $this->plans[] = $plan;
-            $plan->addProceso($this);
+        if (!$this->actividads->contains($actividad)) {
+            $this->actividads[] = $actividad;
+            $actividad->setPlan($this);
         }
 
         return $this;
     }
 
-    public function removePlan(Plan $plan): self
+    public function removeActividad(Actividad $actividad): self
     {
-        if ($this->plans->removeElement($plan)) {
-            $plan->removeProceso($this);
+        if ($this->actividads->removeElement($actividad)) {
+            // set the owning side to null (unless already changed)
+            if ($actividad->getPlan() === $this) {
+                $actividad->setPlan(null);
+            }
         }
 
         return $this;
