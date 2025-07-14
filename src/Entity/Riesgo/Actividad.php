@@ -58,6 +58,14 @@ class Actividad
      */
     private $updateBy;
 
+    public function __construct()
+    {
+        $this->createAt = new \DateTime();
+        $this->createBy = 'system'; // Default creator, can be changed later
+        $this->updateAt = null; // Initially no updates
+        $this->updateBy = null; // Initially no updates
+    }
+
     public function getId(): ?int
     {
         return $this->id;

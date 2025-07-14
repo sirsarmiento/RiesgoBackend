@@ -184,6 +184,8 @@ class PlanRepository extends ServiceEntityRepository
             $events = [];
             $controls = [];
             $risks = [];
+            $activities = [];
+
             foreach ($plan->getUsers() as $user) {
                 $responsibles[] = [
                     'id'     => $user->getId(),
@@ -223,6 +225,16 @@ class PlanRepository extends ServiceEntityRepository
                     'frequencyName'  => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
                 ];
             }
+            foreach ($plan->getActividads() as $activity) {
+                $user = $activity->getUser(); 
+                $activities[] = [
+                    'id'          => $activity->getId(),
+                    'activity'        => $activity->getActivity(),
+                    'done'        => $activity->getDone() == 1 ? true : false,
+                    'user'   => $user ? $user->getId() : null,
+                    'fullName' => $user ? $user->getPrimerNombre() . ' ' . $user->getPrimerApellido() : null, // Ajusta el método getName() según tu entidad User
+                ];
+            }
             $result[] = [
                 'id'          => $plan->getId(),
                 'name'        => $plan->getName(),
@@ -234,6 +246,7 @@ class PlanRepository extends ServiceEntityRepository
                 'events' => $events,
                 'controls' => $controls,
                 'risks' => $risks,
+                'activities' => $activities,
             ];
         }
         return $result;
