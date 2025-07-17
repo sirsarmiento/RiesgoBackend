@@ -142,6 +142,8 @@ class ControlRepository extends ServiceEntityRepository
                     'impactName'        => $risk->getImpact()  == null ? '' : $risk->getImpact()->getDescripcion(),
                     'frecuency'        => $risk->getFrequency() == null ? 0 : $risk->getFrequency()->getId(),
                     'frequencyName'        => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getDescripcion(),
+                    'impactWeight'        => $risk->getImpact()  == null ? '' : $risk->getImpact()->getPeso(),
+                    'frequencyWeight'        => $risk->getFrequency() == null ? '' : $risk->getFrequency()->getPeso()
                 ];
             }
             $result[] = [
