@@ -91,7 +91,7 @@ class Evaluacion
         $this->users = new ArrayCollection();
         $this->controls = new ArrayCollection();
         $this->riesgos = new ArrayCollection();
-        $this->createdAt = new \DateTime();
+        $this->createAt = new \DateTime();
         $this->createBy = 'system'; // Default creator
     }
 

@@ -237,6 +237,11 @@ class User implements UserInterface
      */
     private $evaluacions;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $idestructura;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -917,6 +922,18 @@ class User implements UserInterface
         if ($this->evaluacions->removeElement($evaluacion)) {
             $evaluacion->removeUser($this);
         }
+
+        return $this;
+    }
+
+    public function getIdestructura(): ?int
+    {
+        return $this->idestructura;
+    }
+
+    public function setIdestructura(?int $idestructura): self
+    {
+        $this->idestructura = $idestructura;
 
         return $this;
     }

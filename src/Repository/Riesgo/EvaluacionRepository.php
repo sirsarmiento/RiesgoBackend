@@ -131,7 +131,6 @@ class EvaluacionRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $evaluacions = $this->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
-            ->leftJoin('p.riesgos', 'r')
             ->addSelect('u')
             ->addOrderBy('p.name', 'ASC')
             ->getQuery()
@@ -173,8 +172,8 @@ class EvaluacionRepository extends ServiceEntityRepository
                 'name'        => $evaluacion->getName(),
                 'description'   => $evaluacion->getDescription(),
                 'type'   => $evaluacion->getType(),
-                'startDate'   => $evaluacion->getStartDate(),
-                'endDate'   => $evaluacion->getEndDate(),
+                'startDate'   => $evaluacion->getStartDate()->format('Y-m-d'),
+                'endDate'   => $evaluacion->getEndDate()->format('Y-m-d'),
                 'responsibles' => $responsibles,
                 'risks' => $risks,
                 'controls' => $controls,

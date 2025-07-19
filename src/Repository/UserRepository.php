@@ -1212,6 +1212,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $users = $this->createQueryBuilder('p')
+            ->addOrderBy('p.primerNombre', 'ASC')
             ->getQuery()
             ->getResult();
 
