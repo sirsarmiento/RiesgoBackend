@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Json;
 
 class EmpresaController extends AbstractController
 {
-          /**
+    /**
         *  Get Pais by Pais Id.
         * @Route("/api/empresa/List", methods={"GET"})
         * @OA\Post(
@@ -61,7 +61,7 @@ class EmpresaController extends AbstractController
     }
 
 
-        /**
+    /**
         * @Route("/api/empresa", methods={"POST"})
         * @OA\Post(
          * summary="Create Empresa",
@@ -98,7 +98,7 @@ class EmpresaController extends AbstractController
         }
     }
 
-        /**
+    /**
         * @Route("/api/empresa/actualizar/{id}", methods={"PUT"})
         * @OA\Put(
          * summary="Put Empresa",
@@ -133,6 +133,47 @@ class EmpresaController extends AbstractController
         } catch (Exception $e) {
             return new JsonResponse(['msg'=>'Error del Servidor'],500);
         }
+    }
+
+    /**
+        * Get Resumen By Empresa.
+        * @Route("/api/empresa/resumen", methods={"GET"})
+        * @OA\Post(
+         * summary="Resumen List",
+         * description="Resumen List",
+         * operationId="ResumenList",
+         * tags={"Empresa"},
+         * @OA\RequestBody(
+         *    @OA\JsonContent(
+         *       required={"page"},
+         *       @OA\Property(property="totalProcesses", type="integer", format="integer", example="1"),
+         *       @OA\Property(property="totalRisks", type="integer", format="integer", example="1"),
+         *       @OA\Property(property="totalControls", type="integer", format="integer", example="1"),
+         *       @OA\Property(property="totalEvents", type="integer", format="integer", example="1"),
+         *       @OA\Property(property="totalPlans", type="integer", format="integer", example="1"),
+         *    ),
+         * ),
+         * @OA\Response(
+         *    response=422,
+         *    description="Wrong credentials response",
+         *    @OA\JsonContent(
+         *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+         *        )
+         *     )
+         * )
+         * @OA\Tag(name="Empresa")
+         * @Security(name="Bearer")
+    */  
+
+    public function resumen(Request $request,EmpresaRepository $empresaRepository): JsonResponse
+    {
+        $param = json_decode($request->getContent(),true);
+        $data = $empresaRepository
+        ->resumen();
+        if (!$data) {
+            return new JsonResponse(['msg'=>'No existen Registros'],200);  
+        }   
+         return new JsonResponse($data,200);  
     }
 
 

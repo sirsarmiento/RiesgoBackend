@@ -158,6 +158,11 @@ class Control
      */
     private $plans;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evaluacion::class, mappedBy="controls")
+     */
+    private $evaluacions;
+
 
     public function __construct()
     {
@@ -167,6 +172,7 @@ class Control
         $this->createBy = 'system'; // Default creator
         $this->eventos = new ArrayCollection();
         $this->plans = new ArrayCollection();
+        $this->evaluacions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -541,6 +547,33 @@ class Control
     {
         if ($this->plans->removeElement($plan)) {
             $plan->removeControl($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evaluacion[]
+     */
+    public function getEvaluacions(): Collection
+    {
+        return $this->evaluacions;
+    }
+
+    public function addEvaluacion(Evaluacion $evaluacion): self
+    {
+        if (!$this->evaluacions->contains($evaluacion)) {
+            $this->evaluacions[] = $evaluacion;
+            $evaluacion->addControl($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluacion(Evaluacion $evaluacion): self
+    {
+        if ($this->evaluacions->removeElement($evaluacion)) {
+            $evaluacion->removeControl($this);
         }
 
         return $this;

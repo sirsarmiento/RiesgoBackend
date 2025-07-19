@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Riesgo\CausaConsecuencia;
 use App\Entity\Riesgo\Control;
+use App\Entity\Riesgo\Evaluacion;
 use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\ParametrosControl;
 use App\Entity\Riesgo\Plan;
@@ -104,6 +105,11 @@ class Empresa
      */
     private $plans;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Evaluacion::class, mappedBy="empresa")
+     */
+    private $evaluacions;
+
 
     public function __construct()
     {
@@ -115,6 +121,7 @@ class Empresa
         $this->parametrosControls = new ArrayCollection();
         $this->eventos = new ArrayCollection();
         $this->plans = new ArrayCollection();
+        $this->evaluacions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -440,6 +447,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($plan->getEmpresa() === $this) {
                 $plan->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evaluacion[]
+     */
+    public function getEvaluacions(): Collection
+    {
+        return $this->evaluacions;
+    }
+
+    public function addEvaluacion(Evaluacion $evaluacion): self
+    {
+        if (!$this->evaluacions->contains($evaluacion)) {
+            $this->evaluacions[] = $evaluacion;
+            $evaluacion->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluacion(Evaluacion $evaluacion): self
+    {
+        if ($this->evaluacions->removeElement($evaluacion)) {
+            // set the owning side to null (unless already changed)
+            if ($evaluacion->getEmpresa() === $this) {
+                $evaluacion->setEmpresa(null);
             }
         }
 

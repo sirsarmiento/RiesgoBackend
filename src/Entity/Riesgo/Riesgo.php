@@ -109,6 +109,11 @@ class Riesgo
      */
     private $plans;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evaluacion::class, mappedBy="riesgos")
+     */
+    private $evaluacions;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -119,6 +124,7 @@ class Riesgo
         $this->createBy = 'System'; // Default value, can be changed later
         $this->eventos = new ArrayCollection();
         $this->plans = new ArrayCollection();
+        $this->evaluacions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -383,6 +389,33 @@ class Riesgo
     {
         if ($this->plans->removeElement($plan)) {
             $plan->removeRiesgo($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evaluacion[]
+     */
+    public function getEvaluacions(): Collection
+    {
+        return $this->evaluacions;
+    }
+
+    public function addEvaluacion(Evaluacion $evaluacion): self
+    {
+        if (!$this->evaluacions->contains($evaluacion)) {
+            $this->evaluacions[] = $evaluacion;
+            $evaluacion->addRiesgo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluacion(Evaluacion $evaluacion): self
+    {
+        if ($this->evaluacions->removeElement($evaluacion)) {
+            $evaluacion->removeRiesgo($this);
         }
 
         return $this;

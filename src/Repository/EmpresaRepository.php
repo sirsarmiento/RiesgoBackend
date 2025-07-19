@@ -102,33 +102,30 @@ class EmpresaRepository extends ServiceEntityRepository
 
     }
 
-
-    // /**
-    //  * @return Empresa[] Returns an array of Empresa objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function resumen(): array
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $entityManager = $this->getEntityManager();
+        $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
 
-    /*
-    public function findOneBySomeField($value): ?Empresa
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $resumen = [
+            'processes' => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Proceso', $empresa),
+            'risks'     => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Riesgo', $empresa),
+            'controls'  => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Control', $empresa),
+            'events'    => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Evento', $empresa),
+            'plans'     => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Plan', $empresa),
+            'evaluations'     => 0, //Falta desarrollar esta entidad
+        ];
+
+        return $resumen;
     }
-    */
+
+    private function countByEmpresa($em, string $entityClass, Empresa $empresa): int
+    {
+        return (int) $em->createQuery("
+            SELECT COUNT(e.id) FROM $entityClass e
+            WHERE e.empresa = :empresa
+        ")
+        ->setParameter('empresa', $empresa)
+        ->getSingleScalarResult();
+    }
 }

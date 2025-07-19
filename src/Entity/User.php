@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Empresa;
 use App\Entity\Riesgo\Actividad;
+use App\Entity\Riesgo\Evaluacion;
 use App\Entity\Riesgo\Evento;
 use App\Entity\Riesgo\Plan;
 use App\Entity\Riesgo\ProyectoResponsables;
@@ -231,6 +232,11 @@ class User implements UserInterface
      */
     private $actividads;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Evaluacion::class, mappedBy="users")
+     */
+    private $evaluacions;
+
     public function __construct()
     {
         $this->telefonos = new ArrayCollection();
@@ -246,6 +252,7 @@ class User implements UserInterface
         $this->eventos = new ArrayCollection();
         $this->plans = new ArrayCollection();
         $this->actividads = new ArrayCollection();
+        $this->evaluacions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -882,6 +889,33 @@ class User implements UserInterface
             if ($actividad->getUser() === $this) {
                 $actividad->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Evaluacion[]
+     */
+    public function getEvaluacions(): Collection
+    {
+        return $this->evaluacions;
+    }
+
+    public function addEvaluacion(Evaluacion $evaluacion): self
+    {
+        if (!$this->evaluacions->contains($evaluacion)) {
+            $this->evaluacions[] = $evaluacion;
+            $evaluacion->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluacion(Evaluacion $evaluacion): self
+    {
+        if ($this->evaluacions->removeElement($evaluacion)) {
+            $evaluacion->removeUser($this);
         }
 
         return $this;
