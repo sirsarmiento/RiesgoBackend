@@ -187,7 +187,6 @@ class UserOutPutDto
      */
     public $sexo;
 
-
     /**
     * @OA\Property(
     *      type="array",
@@ -198,6 +197,11 @@ class UserOutPutDto
     *      description="redes"
     * )     */
     public  $redes;
+    
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    public $idestructura;
 
     public function __construct()
     {
@@ -394,6 +398,11 @@ class UserOutPutDto
     public function getCoordinacion(): string
     {
         return $this->Coordinacion;
+    }
+
+    public function getIdestructura(): ?int
+    {
+        return $this->idestructura;
     }
 
 }

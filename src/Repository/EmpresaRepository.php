@@ -113,7 +113,7 @@ class EmpresaRepository extends ServiceEntityRepository
             'controls'  => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Control', $empresa),
             'events'    => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Evento', $empresa),
             'plans'     => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Plan', $empresa),
-            'evaluations'     => 0, //Falta desarrollar esta entidad
+            'evaluations'     => $this->countByEmpresa($entityManager, 'App\Entity\Riesgo\Evaluacion', $empresa),
         ];
 
         return $resumen;

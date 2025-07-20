@@ -22,6 +22,7 @@ use App\Entity\Coordinacion;
 use App\Entity\CorreoSubject;
 use App\Entity\Dependencia;
 use App\Entity\Empresa;
+use App\Entity\EstructuraOrganizativa;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Asset\Packages;
@@ -59,6 +60,7 @@ class UserRepository extends ServiceEntityRepository
     public function post($data,$validator,$helper,$email): JsonResponse  {
         $entityManager = $this->getEntityManager();
         $roles=[];
+
         $existeUser = $this->createQueryBuilder('p')
         ->where("p.email='".$data["email"]."'")->orWhere("p.numeroDocumento='".$data["numeroDocumento"]."'")->orWhere("p.username='".$data["email"]."'")->orderBy('p.id', 'ASC')->getQuery()->getResult();
         if(count($existeUser)>0){
@@ -69,14 +71,19 @@ class UserRepository extends ServiceEntityRepository
         foreach($data["roles"] as $clave=>$valor){
                 $roles[]= $valor['rol'];            
         }
+
         $data["roles"]=trim(json_encode($roles),'"');
 
         $entity=$helper->setParametersToEntity(new User(),$data);
         $psswd = $data["numeroDocumento"];
+
         $entity->setPassword($this->passwordEncoder->encodePassword(
             $entity,
             isset($psswd) ? $psswd : '123456'
         ));
+
+        //$entity->setIdestructura($data["idestructura"]);
+
         $entity->setUsername($data["email"]);
         $errors = $validator->validate($entity);
         if($errors->count() > 0){
@@ -95,6 +102,7 @@ class UserRepository extends ServiceEntityRepository
                 $entity->setIdCoordinacion($entityCoordinacion?$entityCoordinacion:null);
 
             }
+
             $entity->setPais($entityPais);
             $entity->setEstado($entityEstado);
             $entity->setCiudad($entityCiudad);
@@ -103,7 +111,9 @@ class UserRepository extends ServiceEntityRepository
             $currentUser =$entityManager->getRepository(User::class)->find($this->security->getUser()->getId());
             $entity->setCreateBy($currentUser->getUserName());
             $entity->setRoles(json_encode($data["roles"]));
+
             $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
+
             if($empresa)
                 $entity->setIdempresa($empresa);
             $entityManager->persist($entity);
@@ -158,7 +168,9 @@ class UserRepository extends ServiceEntityRepository
       	->setMaxResults($data['rowByPage']);	
         $dataUser=array();
         $telefonosUser=[];
+
         foreach($paginator as $clave=>$valor){
+ 
             $userDto =new UserOutPutDto();
             $userDto->id=$valor->getId();
             $userDto->username=$valor->getUserName();
@@ -171,9 +183,24 @@ class UserRepository extends ServiceEntityRepository
             $userDto->fechaNacimiento=  $valor->getFechaNacimiento() == null ? '' : $valor->getFechaNacimiento()->format("Y-m-d");
             $userDto->email=$valor->getEmail();
             $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
-            $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
-            $userDto->Gerencia=($valor->getIdGerencia()!=null)?array("id"=>$valor->getIdGerencia()->getId(),"Nombre"=>$valor->getIdGerencia()->getNombre()):[];
-            $userDto->Coordinacion=($valor->getIdCoordinacion()!=null)?array("id"=>$valor->getIdCoordinacion()->getId(),"Nombre"=>$valor->getIdCoordinacion()->getNombre()):[]; 
+            $userDto->idestructura=$valor->getIdestructura();
+
+            //$userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
+            //$userDto->Gerencia=($valor->getIdGerencia()!=null)?array("id"=>$valor->getIdGerencia()->getId(),"Nombre"=>$valor->getIdGerencia()->getNombre()):[];
+            //$userDto->Coordinacion=($valor->getIdCoordinacion()!=null)?array("id"=>$valor->getIdCoordinacion()->getId(),"Nombre"=>$valor->getIdCoordinacion()->getNombre()):[];
+
+            $idEstructura = $valor->getIdestructura();
+
+            if ($idEstructura !== null) {
+                $estructura = $entityManagerDefault
+                    ->getRepository(EstructuraOrganizativa::class)
+                    ->find($idEstructura);
+
+                if ($estructura) {
+                    $userDto->Dependencia = $estructura->getEstructuraOrganizativa();
+                }
+            }
+
             $userDto->pais=($valor->getPais()!=null)?array("id"=>$valor->getPais()->getId(),"Nombre"=>$valor->getPais()->getNombre()):[];
             $userDto->status=($valor->getIdStatus()!=null)?array("id"=>$valor->getIdStatus()->getId(),"Descripcion"=>$valor->getIdStatus()->getDescripcion()):[];
             $userDto->estado=($valor->getEstado()!=null)?array("id"=>$valor->getEstado()->getId(),"Nombre"=>$valor->getEstado()->getNombre()):[];
@@ -1215,6 +1242,8 @@ class UserRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $users = $this->createQueryBuilder('p')
+            ->where('p.idStatus = :status')
+            ->setParameter('status', 1)
             ->addOrderBy('p.primerNombre', 'ASC')
             ->getQuery()
             ->getResult();
