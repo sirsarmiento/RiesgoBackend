@@ -54,7 +54,7 @@ class EstructuraOrganizativaRepository extends ServiceEntityRepository
 
           $dataEstructuraOrganizativa[]=$profesionDto;
       }
-       return array("data"=>$dataEstructuraOrganizativa);
+       return $dataEstructuraOrganizativa;
     }
 
 
@@ -85,7 +85,7 @@ class EstructuraOrganizativaRepository extends ServiceEntityRepository
 
           $dataEstructuraOrganizativa[]=$profesionDto;
       }
-       return array("data"=>$dataEstructuraOrganizativa);
+       return $dataEstructuraOrganizativa;
     }
         
     // /**

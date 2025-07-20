@@ -168,7 +168,7 @@ class UserRepository extends ServiceEntityRepository
             $userDto->segundoNombre=$valor->getSegundoNombre();
             $userDto->primerApellido= $valor->getPrimerApellido();
             $userDto->segundoApellido= $valor->getSegundoApellido();
-            $userDto->fechaNacimiento=$valor->getFechaNacimiento()->format("Y-m-d");
+            $userDto->fechaNacimiento=  $valor->getFechaNacimiento() == null ? '' : $valor->getFechaNacimiento()->format("Y-m-d");
             $userDto->email=$valor->getEmail();
             $userDto->cargo=($valor->getIdCargo()!=null)?array("id"=>$valor->getIdCargo()->getId(),"Descripcion"=>$valor->getIdCargo()->getDescripcion()):[];
             $userDto->Dependencia=($valor->getIdDependencia()!=null)?array("id"=>$valor->getIdDependencia()->getId(),"Descripcion"=>$valor->getIdDependencia()->getDescripcion()):[];
@@ -205,12 +205,15 @@ class UserRepository extends ServiceEntityRepository
             foreach($valor->getTelefonos()as $telefonos){
                 $telefonosUser[]=array("id"=>$telefonos->getId(),"numero"=>$telefonos->getNumero());
             }
+
             $userDto->telefonos=$telefonosUser;
+      
             if($valor->getRoles()!=null){
                 foreach($valor->getRoles()as $roles){
                     $rolesUser[]=array("rol"=>$roles);
                 }
             }    
+
             $userDto->roles= $rolesUser;
             $rolesUser=[];
             $telefonosUser=[];
