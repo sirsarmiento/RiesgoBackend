@@ -70,13 +70,16 @@ class RolRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-        $eventorol=array();
-        $cont=0;
-        foreach($data as $clave=>$valor){
-             $eventorol[$cont]=array("descripcion"=> $valor->getDescripcion());
-             $cont++;
+
+        $result = [];
+        foreach ($data as $rol) {
+            $result[] = [
+                'id'          => $rol->getId(),
+                'descripcion' => $rol->getDescripcion(),
+            ];
         }
-        return array($eventorol);
+
+        return $result;
     }
 
 
